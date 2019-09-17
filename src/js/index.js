@@ -25,6 +25,7 @@ class App {
 		this.river_.btn_rename.label("Rename").onValue(() => console.log("Rename"));
 		this.river_.btn_todo.onValue(() => this.read("Todo"));
 		this.river_.btn_backup.onValue(() => this.backup());
+		this.river_.btn_print.onValue(() => this.print());
 		this.river_.btn_delete.onValue(() => this.remove());
 		this.river_.btn_keys.label("???").onValue(() => console.log(1111, storage.getKeys()));
 		this.river_.btn_runTests.onValue(() => testRunner.runTests(this.river_.txt_log));
@@ -87,6 +88,31 @@ class App {
 		const text = filename + delimiter + texts.join(delimiter);
 		this.saveFile(filename, text);
 	};
+
+	print() {
+		//don't know how to get rid of first indent in print window
+		const text = this.river_.txt_text.value();
+
+		if (!text) {
+			alert("No selected knowt");
+			return this;
+		}
+		const html = `
+			<style>
+				.plainText {
+					white-space: pre-wrap;
+				}
+			</style>
+			<div class="plainText">
+			${text}
+			</div>`;
+		const newWindow = window.open("", "PrintWindow", "width=500,height=500,top=200,left=200,menubar=no,toolbars=no,scrollbars=no,status=no,resizable=no");
+		newWindow.document.writeln(html);
+		newWindow.document.close();
+		newWindow.focus();
+		newWindow.print();
+		newWindow.close();
+	}
 
 	main() {
 		renderEngine.render(this.river_);

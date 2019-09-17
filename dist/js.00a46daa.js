@@ -36118,6 +36118,9 @@ function () {
       this.river_.btn_backup.onValue(function () {
         return _this.backup();
       });
+      this.river_.btn_print.onValue(function () {
+        return _this.print();
+      });
       this.river_.btn_delete.onValue(function () {
         return _this.remove();
       });
@@ -36145,7 +36148,6 @@ function () {
       }); //
 
       this.river_.txt_log.touch();
-      window.river = this.river_;
     }
   }, {
     key: "save",
@@ -36200,6 +36202,25 @@ function () {
       this.saveFile(filename, text);
     }
   }, {
+    key: "print",
+    value: function print() {
+      //don't know how to get rid of first indent in print window
+      var text = this.river_.txt_text.value();
+
+      if (!text) {
+        alert("No selected knowt");
+        return this;
+      }
+
+      var html = "\n\t\t\t<style>\n\t\t\t\t.plainText {\n\t\t\t\t\twhite-space: pre-wrap;\n\t\t\t\t}\n\t\t\t</style>\n\t\t\t<div class=\"plainText\">\n\t\t\t".concat(text, "\n\t\t\t</div>");
+      var newWindow = window.open("", "PrintWindow", "width=500,height=500,top=200,left=200,menubar=no,toolbars=no,scrollbars=no,status=no,resizable=no");
+      newWindow.document.writeln(html);
+      newWindow.document.close();
+      newWindow.focus();
+      newWindow.print();
+      newWindow.close();
+    }
+  }, {
     key: "main",
     value: function main() {
       renderEngine.render(this.river_);
@@ -36246,7 +36267,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "56282" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "50107" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
