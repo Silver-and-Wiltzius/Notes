@@ -16,7 +16,18 @@ class Storage {
 
 	getItem(sKey, zResult) {
 		const result = localStorage.getItem(this.prefix_ + sKey);
-		zResult.cuPush(result);
+		if(zResult) {
+			zResult.cuPush(result);
+		}
+		return result;
+	}
+
+	getAllItems(zResult) {
+		const result = [];
+		this.getKeys().forEach(each => result.push(this.getItem(each)));
+		if(zResult) {
+			zResult.cuPush(result);
+		}
 		return result;
 	}
 

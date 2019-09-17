@@ -1,0 +1,231 @@
+/* ================================
+/* Guide
+/* ================================
+float, flex
+(type of element)
+color
+font
+dimensions
+padding
+margin
+border
+/* ================================ */
+/* ================================
+/* Shims
+/* ================================ */
+*:focus {
+  outline: none;
+}
+* {
+  font-family: 'Trebuchet MS', Tahoma, sans-serif;
+  font-size: 14px;
+  padding: 0;
+  margin: 0;
+}
+* {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+textarea {
+  background-color: inherit;
+}
+/* ================================
+/* Colors
+/* ================================ */
+/* ================================
+/* Mixin
+/* ================================ */
+#mixin .bordered {
+  border: 2px solid;
+  border-radius: 10px;
+  padding: 10px;
+}
+#mixin .pane {
+  border: 2px solid;
+  border-radius: 10px;
+  padding: 10px;
+  margin-right: 10px;
+  background-color: #d70;
+  height: 600px;
+}
+#mixin .button {
+  background-color: #aa0;
+  margin-right: 4px;
+  margin-bottom: 4px;
+  padding: 5px;
+  min-width: 60px;
+  border-radius: 5px;
+}
+/* ================================
+/* General
+/* ================================ */
+body {
+  background-color: #a70;
+  padding: 10px;
+}
+button {
+  background-color: #aa0;
+  margin-right: 4px;
+  margin-bottom: 4px;
+  padding: 5px;
+  min-width: 60px;
+  border-radius: 5px;
+}
+button.search {
+  background-color: #fd0;
+}
+button.system {
+  background-color: #00a;
+}
+button[data-name*='UT'] {
+  background-color: #0aa;
+}
+button[data-name='GenCode'] {
+  background-color: #d95;
+}
+textarea {
+  tab-size: 4;
+  line-height: 20px;
+}
+ul {
+  list-style-type: none;
+}
+input {
+  background-color: #fb0;
+  padding-left: 10px;
+  padding-right: 10px;
+  border-radius: 10px;
+}
+/* ================================
+/* Dropdown
+/* ================================ */
+.dd-wrapper {
+  display: inline-block;
+}
+.dd-wrapper:hover {
+  cursor: pointer;
+}
+.dd-list-item,
+.dd-header-title {
+  width: 200px;
+  background-color: #aa0;
+  margin-right: 4px;
+  margin-bottom: 4px;
+  padding: 5px;
+  min-width: 60px;
+  border-radius: 5px;
+}
+/* ================================
+/* Orange
+/* ================================ */
+#divSearch input {
+  height: 30px;
+  width: 100%;
+}
+#knowtLinks {
+  padding-top: 5px;
+  padding-bottom: 10px;
+}
+.KnowtLink {
+  background-color: #aa0;
+  margin-right: 4px;
+  margin-bottom: 4px;
+  padding: 5px;
+  min-width: 60px;
+  border-radius: 5px;
+}
+#ul_keys li:hover,
+.FinderColumn li:hover {
+  background-color: brown;
+}
+#divHeader {
+  border: 2px solid;
+  border-radius: 10px;
+  padding: 10px;
+  display: inline-block;
+  margin-bottom: 10px;
+}
+#divFinder {
+  border: 2px solid;
+  border-radius: 10px;
+  padding: 10px;
+  display: flex;
+  width: 100%;
+  margin-bottom: 10px;
+  padding-right: 0;
+}
+#txt_text {
+  flex: 0 1 auto;
+  width: 700px;
+}
+#txt_log {
+  flex: 0 1 auto;
+  width: 350px;
+}
+#divDisplay {
+  display: none;
+  flex: 0 1 auto;
+  width: 800px;
+}
+#txaMessages {
+  flex: 0 1000000 auto;
+  width: 400px;
+}
+.TextPane,
+.FinderColumn,
+#ul_keys,
+#divDisplay {
+  border: 2px solid;
+  border-radius: 10px;
+  padding: 10px;
+  margin-right: 10px;
+  background-color: #d70;
+  height: 600px;
+}
+.Finder {
+  flex: none;
+  display: flex;
+  margin-right: 10px;
+}
+.FinderColumn {
+  margin-right: 0;
+}
+.FinderColumn .selected {
+  background-color: orange;
+}
+.log {
+  width: 50px;
+  word-break: break-all;
+  word-wrap: break-word;
+}
+#btnTodo {
+  background-color: orange;
+}
+#btnToday {
+  background-color: red;
+}
+.isDirty {
+  background-color: red;
+}
+.actionButton {
+  background-color: red;
+}
+.btnTest {
+  background-color: green;
+}
+#ul_keys {
+  display: inline-block;
+}
+#panes {
+  display: flex;
+}
+.getsDirty.isDirty {
+  background-color: red;
+}
+.getsDirty {
+  background-color: green;
+}
+
+
+/*# sourceMappingURL=/css.3ce18ce9.css.map */

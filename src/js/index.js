@@ -1,5 +1,6 @@
 import F from "./Factory";
 import $ from "jquery";
+import moment from "moment";
 
 console.log("start index.js");
 //
@@ -8,7 +9,7 @@ console.log("start index.js");
 // ===============
 const renderEngine = new F.RenderEngine();
 const testRunner = new F.TestRunner();
-const storage = new F.Storage("R10_");
+window.storage = new F.Storage("R10_");
 // ===============
 // app
 // ===============
@@ -23,6 +24,7 @@ class App {
 		this.river_.btn_save.onValue(() => this.save());
 		this.river_.btn_rename.label("Rename").onValue(() => console.log("Rename"));
 		this.river_.btn_todo.onValue(() => this.read("Todo"));
+		this.river_.btn_backup.onValue(() => this.backup());
 		this.river_.btn_delete.onValue(() => this.remove());
 		this.river_.btn_keys.label("???").onValue(() => console.log(1111, storage.getKeys()));
 		this.river_.btn_runTests.onValue(() => testRunner.runTests(this.river_.txt_log));
@@ -63,6 +65,28 @@ class App {
 	updateKeys() {
 		this.river_.ul_keys.uPush(storage.getKeys());
 	}
+
+	saveFile(filename, data) {
+		const blob = new Blob([data], {type: "text/text"});
+		const element = window.document.createElement("a");
+		const url = window.URL.createObjectURL(blob);
+		element.href = url;
+		element.download = filename;
+		document.body.appendChild(element);
+		element.click();
+		document.body.removeChild(element);
+		window.URL.revokeObjectURL(url);
+	}
+
+	backup() {
+		const delimiter = "\n===||===||===\n";
+		const texts = storage.getAllItems();
+		console.log(111,texts);
+		const date = moment().format("YYYYMMDD[]HHmm");
+		const filename = "knowts" + date + ".txt";
+		const text = filename + delimiter + texts.join(delimiter);
+		this.saveFile(filename, text);
+	};
 
 	main() {
 		renderEngine.render(this.river_);
