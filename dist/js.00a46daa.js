@@ -31269,6 +31269,15 @@ function () {
         });
       });
       streamKeys.filter(function (each) {
+        return each.startsWith("form_");
+      }).forEach(function (each) {
+        var id = each;
+
+        var label = river[each].label() || _this.labelFromIndex(each);
+
+        (0, _jquery.default)("#buttons").append("<input type=\"search\" id=\"".concat(id, "\" class=\"Form\" placeholder=\"").concat(label, "\">"));
+      });
+      streamKeys.filter(function (each) {
         return each.startsWith("ul_");
       }).forEach(function (each) {
         var id = each; //create the list once
@@ -36129,6 +36138,10 @@ function () {
       });
       this.river_.btn_runTests.onValue(function () {
         return testRunner.runTests(_this.river_.txt_log);
+      });
+      this.river_.form_search.onValue();
+      this.river_.btn_search.onValue(function () {
+        return _this.search();
       }); //
 
       this.river_.ul_keys.touch();
@@ -36195,7 +36208,6 @@ function () {
     value: function backup() {
       var delimiter = "\n===||===||===\n";
       var texts = storage.getAllItems();
-      console.log(111, texts);
       var date = (0, _moment.default)().format("YYYYMMDD[]HHmm");
       var filename = "knowts" + date + ".txt";
       var text = filename + delimiter + texts.join(delimiter);
@@ -36221,6 +36233,48 @@ function () {
       newWindow.close();
     }
   }, {
+    key: "search",
+    value: function search() {
+      var terms = (0, _jquery.default)('#form_search').val().toLowerCase().split(" ");
+      var texts = storage.getAllItems();
+      var results = [];
+      var keys = storage.getKeys();
+      console.log(keys);
+
+      if (terms.length < 2 && terms[0] == "") {
+        alert('No Search paramters entered!');
+        return;
+      }
+
+      ;
+      texts.forEach(function (text) {
+        var test = [];
+        terms.forEach(function (term) {
+          if (text.toLowerCase().includes(term)) {
+            test.push(term);
+          }
+        });
+
+        if (test.length == terms.length) {
+          var key = texts.indexOf(text);
+          results.push(keys[key]);
+        }
+
+        ;
+      });
+
+      if (results.length < 1) {
+        alert("No notes matched the search paramters.");
+        return;
+      }
+
+      console.log(results);
+      (0, _jquery.default)('#ul_keys').empty();
+      results.forEach(function (result) {
+        (0, _jquery.default)('#ul_keys').append('<li>' + result + '</li>');
+      });
+    }
+  }, {
     key: "main",
     value: function main() {
       renderEngine.render(this.river_);
@@ -36234,6 +36288,7 @@ function () {
   return App;
 }();
 
+;
 var app = new App();
 (0, _jquery.default)(document).ready(function () {
   app.main();
@@ -36267,7 +36322,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "50107" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "59273" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

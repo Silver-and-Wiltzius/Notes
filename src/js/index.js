@@ -29,6 +29,8 @@ class App {
 		this.river_.btn_delete.onValue(() => this.remove());
 		this.river_.btn_keys.label("???").onValue(() => console.log(1111, storage.getKeys()));
 		this.river_.btn_runTests.onValue(() => testRunner.runTests(this.river_.txt_log));
+		this.river_.form_search.onValue();
+		this.river_.btn_search.onValue(() => this.search());
 		//
 		this.river_.ul_keys.touch();
 		this.river_.selection_ul_keys.onValue(v => this.read(v));
@@ -82,7 +84,6 @@ class App {
 	backup() {
 		const delimiter = "\n===||===||===\n";
 		const texts = storage.getAllItems();
-		console.log(111,texts);
 		const date = moment().format("YYYYMMDD[]HHmm");
 		const filename = "knowts" + date + ".txt";
 		const text = filename + delimiter + texts.join(delimiter);
@@ -112,7 +113,43 @@ class App {
 		newWindow.focus();
 		newWindow.print();
 		newWindow.close();
-	}
+	};
+
+	search() {
+		const terms = $('#form_search').val().toLowerCase().split(" ");
+		const texts = storage.getAllItems();
+		let results = [];
+		const keys = storage.getKeys()
+		console.log(keys);
+
+		if (terms.length < 2 && terms[0] == "") {
+			alert('No Search paramters entered!');
+			return;
+		};
+
+		texts.forEach(function(text) {
+			let test = [];
+			terms.forEach(function(term) {
+				if (text.toLowerCase().includes(term)) {
+					test.push(term)
+				}
+			});
+
+			if (test.length == terms.length) {
+				let key = texts.indexOf(text)
+				results.push(keys[key]);
+			};
+		});
+		if (results.length < 1) {
+			alert("No notes matched the search paramters.");
+			return;
+		}
+		console.log(results);
+		$('#ul_keys').empty();
+		results.forEach(function(result){
+			$('#ul_keys').append('<li>' + result + '</li>')
+		});
+	};
 
 	main() {
 		renderEngine.render(this.river_);
@@ -120,8 +157,8 @@ class App {
 		$("#btn_Save").addClass("getsDirty");
 		$("#btn_save").addClass("getsDirty");
 		this.read("Todo");
-	}
-}
+	};
+};
 
 const app = new App();
 $(document).ready(() => {
