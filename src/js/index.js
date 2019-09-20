@@ -9,6 +9,7 @@ console.log("start index.js");
 const renderEngine = new F.RenderEngine();
 const testRunner = new F.TestRunner();
 const storage = new F.Storage("R10_");
+const sandbox = new F.Sandbox("TEST");
 // ===============
 // app
 // ===============
@@ -26,6 +27,7 @@ class App {
 		this.river_.btn_delete.onValue(() => this.remove());
 		this.river_.btn_keys.label("???").onValue(() => console.log(1111, storage.getKeys()));
 		this.river_.btn_runTests.onValue(() => testRunner.runTests(this.river_.txt_log));
+		this.river_.btn_sandbox.onValue(() => sandbox.play(this.river_.txt_log));
 		//
 		this.river_.ul_keys.touch();
 		this.river_.selection_ul_keys.onValue(v => this.read(v));
