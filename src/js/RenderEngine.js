@@ -26,6 +26,11 @@ class RenderEngine {
 			$("#buttons").append(`<button id="${id}" class="Button">${label}</button>`);
 			$(`#${id}`).click(event => river[each].push(event));
 		});
+		streamKeys.filter(each => each.startsWith("form_")).forEach(each => {
+			const id = each;
+			const label = river[each].label() || this.labelFromIndex(each);
+			$("#buttons").append(`<input type="search" id="${id}" class="Form" placeholder="${label}">`);
+		});
 		streamKeys.filter(each => each.startsWith("ul_")).forEach(each => {
 			const id = each;
 			//create the list once
