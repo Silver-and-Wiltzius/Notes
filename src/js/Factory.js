@@ -3,6 +3,7 @@ import {TestEngine} from "./TestEngine";
 import {TestRunner} from "./TestRunner";
 import {RenderEngine} from "./RenderEngine";
 import {Storage} from "./Storage";
+import {Finder} from "./Finder";
 
 const Factory = {
 	River: River,
@@ -10,6 +11,7 @@ const Factory = {
 	TestRunner: TestRunner,
 	RenderEngine: RenderEngine,
 	Storage: Storage,
+	Finder: Finder,
 	classes: function () {
 		return Object.values(this);
 	},

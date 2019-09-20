@@ -47,6 +47,8 @@ class App {
 		});
 		//
 		this.river_.txt_log.touch();
+		this.river_.fnd_paths.push([["one", "two", "three"], ["one", "two", "four"], ["aaa", "bbb", "ccc"], ["aaa", "bbb", "ddd"]]);
+		this.river_.selection_fnd_paths.onValue(v => this.river_.txt_log.push(v));
 	}
 
 	save() {
