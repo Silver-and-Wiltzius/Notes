@@ -20,6 +20,7 @@ class App {
 
 	initializeRiver() {
 		this.river_ = new F.River();
+		window.river_ = this.river_;
 		//
 		this.river_.btn_save.onValue(() => this.save());
 		this.river_.btn_rename.label("Rename").onValue(() => console.log("Rename"));

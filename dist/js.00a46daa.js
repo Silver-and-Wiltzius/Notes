@@ -31205,7 +31205,238 @@ if ( !noGlobal ) {
 return jQuery;
 } );
 
-},{"process":"../../../../AppData/Roaming/npm/node_modules/parcel-bundler/node_modules/process/browser.js"}],"js/RenderEngine.js":[function(require,module,exports) {
+},{"process":"../../../../AppData/Roaming/npm/node_modules/parcel-bundler/node_modules/process/browser.js"}],"js/Finder.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _jquery = _interopRequireDefault(require("jquery"));
+
+var _lodash = _interopRequireDefault(require("lodash"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+var FinderColumn =
+/*#__PURE__*/
+function () {
+  //========================================================
+  // initialize
+  //========================================================
+  function FinderColumn(iIndex, asKeys, sSelectedKey, fEventColumnSelected) {
+    _classCallCheck(this, FinderColumn);
+
+    // fEventColumnSelected(iIndex, sKey)
+    this.index_ = iIndex;
+    this.keys_ = asKeys;
+    this.selectedKey_ = sSelectedKey;
+    this.eventColumnSelected_ = fEventColumnSelected;
+    this.name_ = "FinderColumn";
+  }
+
+  _createClass(FinderColumn, [{
+    key: "eventOnClick",
+    value: function eventOnClick(event) {
+      var index = event.target.getAttribute("data-index");
+      var key = this.props.column.keys[index];
+      this.props.eventColumnSelected(this.props.column.index, key);
+    }
+  }, {
+    key: "renderOn",
+    value: function renderOn($finder) {
+      var _this = this;
+
+      var elementsString = "";
+      this.keys_.forEach(function (each, index) {
+        var classString = "";
+
+        if (each === _this.selectedKey_) {
+          classString = "class=\"selected\"";
+        }
+
+        elementsString += "<li ".concat(classString, " data-column-index=\"").concat(_this.index_, "\" data-key-index=\"").concat(index, "\">").concat(each, "</li>");
+      });
+      var columnString = "<div id=".concat(this.id_, " class=\"FinderColumn\"><ul>").concat(elementsString, "</ul></div>");
+      $finder.append(columnString);
+    }
+  }]);
+
+  return FinderColumn;
+}();
+
+var Finder =
+/*#__PURE__*/
+function () {
+  //========================================================
+  // initialize
+  //========================================================
+  function Finder(sId, $container, zPaths, zSelectedPath) {
+    var _this2 = this;
+
+    _classCallCheck(this, Finder);
+
+    console.log(2222);
+    this.id_ = sId;
+    this.container_ = $container;
+    this.pathsStream_ = zPaths;
+    this.selectedPathStream_ = zSelectedPath;
+    this.pathsStream_.onValue(function (v) {
+      _this2.render();
+    });
+    this.selectedPathStream_.onValue(function (v) {
+      _this2.render();
+    });
+  } //========================================================
+  // events
+  //========================================================
+
+
+  _createClass(Finder, [{
+    key: "eventColumnSelected",
+    value: function eventColumnSelected(iIndex, sKey) {
+      var oldPath = this.columns_.map(function (each) {
+        return each.selected;
+      });
+      var newPartialPath = oldPath.slice(0, iIndex);
+      newPartialPath.push(sKey);
+      var newTempColumns = this.getColumns(this.props.aasPaths, newPartialPath, 0);
+      var newExtendedPath = newTempColumns.map(function (each) {
+        return each.selected;
+      });
+      var newPath = newExtendedPath.filter(function (each) {
+        return !(each === "----");
+      });
+      this.props.eventPathSelected(newPath);
+    }
+  }, {
+    key: "render",
+    value: function render() {
+      this.renderOn(this.container_);
+    }
+  }, {
+    key: "renderOn",
+    value: function renderOn($container) {
+      var $finder = (0, _jquery.default)("<div id=\"".concat(this.id_, "\" class=\"Finder\"></div>"));
+      $container.prepend($finder);
+      this.columns_ = this.getColumns(this.pathsStream_.value([]), this.selectedPathStream_.value([]), 0);
+      this.columns_.forEach(function (each) {
+        return each.renderOn($finder);
+      });
+    } //================================================
+    // path utility
+    // static for testing without react
+    //================================================
+
+  }, {
+    key: "getColumns",
+    value: function getColumns() {
+      var _this$constructor;
+
+      return (_this$constructor = this.constructor).getColumns.apply(_this$constructor, arguments);
+    }
+  }], [{
+    key: "asExtendPaths",
+    value: function asExtendPaths(aasPaths) {
+      // return copies, with some of them extended
+      var result = [];
+
+      var sorted = _lodash.default.sortBy(aasPaths);
+
+      for (var i = 0; i < sorted.length; i++) {
+        var currentCopy = sorted[i].slice();
+        var next = sorted[i + 1];
+
+        if (next && _lodash.default.isEqual(currentCopy, next.slice(0, currentCopy.length))) {
+          currentCopy.push("----");
+        }
+
+        result.push(currentCopy);
+      }
+
+      return result;
+    }
+  }, {
+    key: "getColumns",
+    value: function getColumns(aasPaths, asPath) {
+      var index = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
+      console.log(3333, aasPaths, asPath, index); //count is used in recursive calls to avoid infinite loops from errors
+
+      if (index > 20) {
+        return ["ERROR"];
+      } //if there are no paths, there are no columns
+
+
+      if (aasPaths.length === 0) {
+        return [];
+      } //extend the paths
+
+
+      var paths = this.asExtendPaths(aasPaths); //get the first column
+
+      var firstKeys = paths.map(function (each) {
+        return each[0];
+      });
+      var uniqueFirstKeys = Array.from(new Set(firstKeys)).sort();
+      var firstSelected;
+
+      if (asPath.length > 0 && uniqueFirstKeys.includes(asPath[0])) {
+        firstSelected = asPath[0];
+      } else {
+        firstSelected = uniqueFirstKeys[0];
+      }
+
+      var firstColumn = new FinderColumn(index, uniqueFirstKeys, firstSelected); //recursively get the rest of the columns
+
+      var restColumns = [];
+      var restPaths = paths.filter(function (each) {
+        return each[0] === firstSelected;
+      }).filter(function (each) {
+        return each.length > 1;
+      }).map(function (each) {
+        return each.slice(1);
+      });
+
+      if (restPaths.length > 0) {
+        var restSelected = asPath.slice(1);
+        restColumns = this.getColumns(restPaths, restSelected, index + 1);
+      } //add the first column to the front of the rest of the columns
+
+
+      var columns = [firstColumn].concat(restColumns); //return result
+
+      return columns;
+    } // =============================
+    // Unit Tests
+    // =============================
+
+  }, {
+    key: "test_first",
+    value: function test_first(t) {
+      t.eq(1, 1);
+    }
+  }, {
+    key: "test_getColumns",
+    value: function test_getColumns(t) {
+      var columns = Finder.getColumns([[1, 2, 3], [1, 2, 4], [1, 5, 6], [7, 8, 9]], [1]);
+      var resultJSON = JSON.stringify(columns, ["keys", "selected"]);
+      var desired = "[{\"keys\":[1,7],\"selected\":1},{\"keys\":[2,5],\"selected\":2},{\"keys\":[3,4],\"selected\":3}]";
+      t.eq(resultJSON, desired);
+    }
+  }]);
+
+  return Finder;
+}();
+
+exports.default = Finder;
+},{"jquery":"../node_modules/jquery/dist/jquery.js","lodash":"../node_modules/lodash/lodash.js"}],"js/RenderEngine.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -31214,6 +31445,8 @@ Object.defineProperty(exports, "__esModule", {
 exports.RenderEngine = void 0;
 
 var _TextPane = _interopRequireDefault(require("./TextPane"));
+
+var _Finder = _interopRequireDefault(require("./Finder"));
 
 var _jquery = _interopRequireDefault(require("jquery"));
 
@@ -31224,6 +31457,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+window.jQuery = _jquery.default;
 
 var RenderEngine =
 /*#__PURE__*/
@@ -31294,6 +31529,12 @@ function () {
             (0, _jquery.default)("#".concat(id)).append("<li>".concat(each2, "</li>"));
           });
         }, true);
+        river["selection_".concat(each)].onValue(function (v) {
+          (0, _jquery.default)("#".concat(id, " li")).removeClass("selected");
+          (0, _jquery.default)("#".concat(id, " li")).filter(function () {
+            return (0, _jquery.default)(this).text() === v;
+          }).addClass("selected");
+        });
       });
       streamKeys.filter(function (each) {
         return each.startsWith("txt_");
@@ -31319,6 +31560,16 @@ function () {
           (0, _jquery.default)("#".concat(id)).val(v);
         }, true);
       });
+      streamKeys.filter(function (each) {
+        return each.startsWith("fnd_");
+      }).forEach(function (each) {
+        console.log(1111);
+        var id = each;
+        var selectionKey = "selection_" + each; // constructor(sId, $container, zPaths, zSelectedPath) {
+
+        var finder = new _Finder.default(id, (0, _jquery.default)("#panes"), river[each], river[selectionKey]);
+        finder.render();
+      });
     }
   }]);
 
@@ -31326,7 +31577,7 @@ function () {
 }();
 
 exports.RenderEngine = RenderEngine;
-},{"./TextPane":"js/TextPane.js","jquery":"../node_modules/jquery/dist/jquery.js"}],"js/Storage.js":[function(require,module,exports) {
+},{"./TextPane":"js/TextPane.js","./Finder":"js/Finder.js","jquery":"../node_modules/jquery/dist/jquery.js"}],"js/Storage.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -31452,12 +31703,15 @@ var _RenderEngine = require("./RenderEngine");
 
 var _Storage = require("./Storage");
 
+var _Finder = require("./Finder");
+
 var Factory = {
   River: _River.River,
   TestEngine: _TestEngine.TestEngine,
   TestRunner: _TestRunner.TestRunner,
   RenderEngine: _RenderEngine.RenderEngine,
   Storage: _Storage.Storage,
+  Finder: _Finder.Finder,
   classes: function classes() {
     return Object.values(this);
   }
@@ -31465,7 +31719,7 @@ var Factory = {
 
 var _default = Factory;
 exports.default = _default;
-},{"./River":"js/River.js","./TestEngine":"js/TestEngine.js","./TestRunner":"js/TestRunner.js","./RenderEngine":"js/RenderEngine.js","./Storage":"js/Storage.js"}],"../node_modules/moment/moment.js":[function(require,module,exports) {
+},{"./River":"js/River.js","./TestEngine":"js/TestEngine.js","./TestRunner":"js/TestRunner.js","./RenderEngine":"js/RenderEngine.js","./Storage":"js/Storage.js","./Finder":"js/Finder.js"}],"../node_modules/moment/moment.js":[function(require,module,exports) {
 var define;
 var global = arguments[3];
 //! moment.js
@@ -36113,7 +36367,8 @@ function () {
     value: function initializeRiver() {
       var _this = this;
 
-      this.river_ = new _Factory.default.River(); //
+      this.river_ = new _Factory.default.River();
+      window.river_ = this.river_; //
 
       this.river_.btn_save.onValue(function () {
         return _this.save();
@@ -36163,6 +36418,10 @@ function () {
       }); //
 
       this.river_.txt_log.touch();
+      this.river_.fnd_paths.push([["one", "two", "three"], ["one", "two", "four"], ["aaa", "bbb", "ccc"], ["aaa", "bbb", "ddd"]]);
+      this.river_.selection_fnd_paths.onValue(function (v) {
+        return _this.river_.txt_log.push(v);
+      });
     }
   }, {
     key: "save",
@@ -36330,7 +36589,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "52641" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "63648" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

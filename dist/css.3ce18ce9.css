@@ -191,7 +191,7 @@ input {
 .FinderColumn {
   margin-right: 0;
 }
-.FinderColumn .selected {
+.ListPane .selected {
   background-color: orange;
 }
 .log {

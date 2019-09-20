@@ -51,7 +51,9 @@ class RenderEngine {
 			}, true);
 			river[`selection_${each}`].onValue(v => {
 				$(`#${id} li`).removeClass("selected");
-				$(`#${id} li:contains("${v}")`).addClass("selected");
+				$(`#${id} li`).filter(function() {
+					return $(this).text() === v;
+				}).addClass("selected");
 			})
 		});
 		streamKeys.filter(each => each.startsWith("txt_")).forEach(each => {
