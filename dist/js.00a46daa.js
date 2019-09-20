@@ -36139,12 +36139,14 @@ function () {
       this.river_.btn_runTests.onValue(function () {
         return testRunner.runTests(_this.river_.txt_log);
       });
-      this.river_.form_search.onValue();
+      this.river_.form_search;
       this.river_.btn_search.onValue(function () {
         return _this.search();
       }); //
 
-      this.river_.ul_keys.touch();
+      this.river_.ul_keys.onValue(function (v) {
+        _this.river_.selection_ul_keys.push(v[0]);
+      });
       this.river_.selection_ul_keys.onValue(function (v) {
         return _this.read(v);
       }); //
@@ -36237,7 +36239,6 @@ function () {
     value: function search() {
       var terms = (0, _jquery.default)('#form_search').val().toLowerCase().split(" ");
       var texts = storage.getAllItems();
-      var results = [];
       var keys = storage.getKeys();
       console.log(keys);
 
@@ -36247,6 +36248,23 @@ function () {
       }
 
       ;
+      var results = this.searchLogic(terms, texts, keys);
+
+      if (results.length < 1) {
+        alert("No notes matched the search paramters.");
+        return;
+      } // $('#ul_keys').empty();
+      // results.forEach(function(result){
+      // 	$('#ul_keys').append('<li>' + result + '</li>')
+      // });
+
+
+      this.river_.ul_keys.push(results);
+    }
+  }, {
+    key: "searchLogic",
+    value: function searchLogic(terms, texts, keys) {
+      var results = [];
       texts.forEach(function (text) {
         var test = [];
         terms.forEach(function (term) {
@@ -36256,23 +36274,13 @@ function () {
         });
 
         if (test.length == terms.length) {
-          var key = texts.indexOf(text);
-          results.push(keys[key]);
+          var index = texts.indexOf(text);
+          results.push(keys[index]);
         }
 
         ;
       });
-
-      if (results.length < 1) {
-        alert("No notes matched the search paramters.");
-        return;
-      }
-
-      console.log(results);
-      (0, _jquery.default)('#ul_keys').empty();
-      results.forEach(function (result) {
-        (0, _jquery.default)('#ul_keys').append('<li>' + result + '</li>');
-      });
+      return results;
     }
   }, {
     key: "main",
@@ -36322,7 +36330,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "59273" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "52641" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

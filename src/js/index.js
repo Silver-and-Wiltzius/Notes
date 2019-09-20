@@ -29,10 +29,12 @@ class App {
 		this.river_.btn_delete.onValue(() => this.remove());
 		this.river_.btn_keys.label("???").onValue(() => console.log(1111, storage.getKeys()));
 		this.river_.btn_runTests.onValue(() => testRunner.runTests(this.river_.txt_log));
-		this.river_.form_search.onValue();
+		this.river_.form_search;
 		this.river_.btn_search.onValue(() => this.search());
 		//
-		this.river_.ul_keys.touch();
+		this.river_.ul_keys.onValue(v => {
+			this.river_.selection_ul_keys.push(v[0]);
+		});
 		this.river_.selection_ul_keys.onValue(v => this.read(v));
 		//
 		this.river_.txt_text.on("eventSave", () => this.save());
@@ -118,7 +120,6 @@ class App {
 	search() {
 		const terms = $('#form_search').val().toLowerCase().split(" ");
 		const texts = storage.getAllItems();
-		let results = [];
 		const keys = storage.getKeys()
 		console.log(keys);
 
@@ -127,8 +128,25 @@ class App {
 			return;
 		};
 
+		const results = this.searchLogic(terms, texts, keys);
+
+		if (results.length < 1) {
+			alert("No notes matched the search paramters.");
+			return;
+		}
+
+		// $('#ul_keys').empty();
+		// results.forEach(function(result){
+		// 	$('#ul_keys').append('<li>' + result + '</li>')
+		// });
+		this.river_.ul_keys.push(results);
+	};
+
+	searchLogic(terms, texts, keys) {
+		const results = []
+
 		texts.forEach(function(text) {
-			let test = [];
+			const test = [];
 			terms.forEach(function(term) {
 				if (text.toLowerCase().includes(term)) {
 					test.push(term)
@@ -136,20 +154,13 @@ class App {
 			});
 
 			if (test.length == terms.length) {
-				let key = texts.indexOf(text)
-				results.push(keys[key]);
+				const index = texts.indexOf(text)
+				results.push(keys[index]);
 			};
 		});
-		if (results.length < 1) {
-			alert("No notes matched the search paramters.");
-			return;
-		}
-		console.log(results);
-		$('#ul_keys').empty();
-		results.forEach(function(result){
-			$('#ul_keys').append('<li>' + result + '</li>')
-		});
-	};
+
+		return results;
+	}
 
 	main() {
 		renderEngine.render(this.river_);
