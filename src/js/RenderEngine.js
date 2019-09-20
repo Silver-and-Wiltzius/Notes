@@ -1,5 +1,8 @@
 import TextPane from "./TextPane";
+import Finder from "./Finder";
 import $ from "jquery";
+
+window.jQuery = $;
 
 class RenderEngine {
 	labelFromIndex(sIndex) {
@@ -46,6 +49,10 @@ class RenderEngine {
 					$(`#${id}`).append(`<li>${each2}</li>`);
 				});
 			}, true);
+			river[`selection_${each}`].onValue(v => {
+				$(`#${id} li`).removeClass("selected");
+				$(`#${id} li:contains("${v}")`).addClass("selected");
+			})
 		});
 		streamKeys.filter(each => each.startsWith("txt_")).forEach(each => {
 			const id = each;
@@ -64,6 +71,14 @@ class RenderEngine {
 			river[each].onValue(v => {
 				$(`#${id}`).val(v);
 			}, true);
+		});
+		streamKeys.filter(each => each.startsWith("fnd_")).forEach(each => {
+			console.log(1111);
+			const id = each;
+			const selectionKey = "selection_" + each;
+			// constructor(sId, $container, zPaths, zSelectedPath) {
+			const finder = new Finder(id, $("#panes"), river[each], river[selectionKey]);
+			finder.render();
 		});
 	}
 }
