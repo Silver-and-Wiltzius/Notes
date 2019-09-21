@@ -32,7 +32,6 @@ export default class Finder {
 	// initialize
 	//========================================================
 	constructor(sId, $container, zPaths, zSelectedPath) {
-		console.log(8888, "Finder constructor");
 		this.id_ = sId;
 		this.container_ = $container;
 		this.pathsStream_ = zPaths;
@@ -50,16 +49,12 @@ export default class Finder {
 	// events
 	//========================================================
 	eventElementSelectedLogic(iIndex, sKey) {
-		console.log(1111, iIndex, sKey);
 		const oldPath = this.columns_.map(each => each.selectedKey_);
 		const newPartialPath = oldPath.slice(0, iIndex);
-		console.log(2222, oldPath, newPartialPath);
 		newPartialPath.push(sKey);
-		console.log(3333, newPartialPath);
 		const newTempColumns = this.getColumns(this.pathsStream_.value(), newPartialPath);
 		const newFullExtendedPath = newTempColumns.map(each => each.selectedKey_);
 		const newFullPath = newFullExtendedPath.filter(each => !(each === "----"));
-		console.log(4444, newFullPath);
 		this.selectedPathStream_.uPush(newFullPath);
 	}
 
@@ -73,14 +68,11 @@ export default class Finder {
 	}
 
 	renderOn($container) {
-		console.log(6666, "renderOn");
 		let $finder = $(`#${this.id_}`);
 		if ($finder.length) {
-			console.log(7777, "exists");
 			// exists
 			$finder.empty();
 		} else {
-			console.log(7777, "does not exist", $container);
 			// does not exist
 			$finder = $(`<div id="${this.id_}" class="Finder"></div>`);
 			$container.prepend($finder);
@@ -117,9 +109,9 @@ export default class Finder {
 	}
 
 	static getColumns(aasPaths, asPath, index = 0) {
-		if (index === 0) {
-			console.log(9999, "getColumns", asPath);
-		}
+		// if (index === 0) {
+		// 	console.log(9999, "getColumns", asPath);
+		// }
 		//count is used in recursive calls to avoid infinite loops from errors
 		if (index > 20) {
 			return ["INFINITE LOOP ERROR"];
