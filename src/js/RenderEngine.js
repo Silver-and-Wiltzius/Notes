@@ -75,10 +75,10 @@ class RenderEngine {
 			}, true);
 		});
 		streamKeys.filter(each => each.startsWith("fnd_")).forEach(each => {
-			console.log(1111);
 			const id = each;
 			const selectionKey = "selection_" + each;
 			// constructor(sId, $container, zPaths, zSelectedPath) {
+			console.log(5555, each, river[each]);
 			const finder = new Finder(id, $("#panes"), river[each], river[selectionKey]);
 			finder.render();
 		});

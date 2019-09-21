@@ -19,9 +19,14 @@ class App {
 	}
 
 	initializeRiver() {
+		// ===================
+		// River
+		// ===================
 		this.river_ = new F.River();
 		window.river_ = this.river_;
-		//
+		// ===================
+		// Buttons
+		// ===================
 		this.river_.btn_save.onValue(() => this.save());
 		this.river_.btn_rename.label("Rename").onValue(() => console.log("Rename"));
 		this.river_.btn_todo.onValue(() => this.read("Todo"));
@@ -30,14 +35,21 @@ class App {
 		this.river_.btn_delete.onValue(() => this.remove());
 		this.river_.btn_keys.label("???").onValue(() => console.log(1111, storage.getKeys()));
 		this.river_.btn_runTests.onValue(() => testRunner.runTests(this.river_.txt_log));
+		// ===================
+		// Search
+		// ===================
 		this.river_.form_search;
 		this.river_.btn_search.onValue(() => this.search());
-		//
+		// ===================
+		// List
+		// ===================
 		this.river_.ul_keys.onValue(v => {
 			this.river_.selection_ul_keys.push(v[0]);
 		});
 		this.river_.selection_ul_keys.onValue(v => this.read(v));
-		//
+		// ===================
+		// Text
+		// ===================
 		this.river_.txt_text.on("eventSave", () => this.save());
 		this.river_.txt_text.onDirty(bIsDirty => {
 			if (bIsDirty) {
@@ -46,10 +58,23 @@ class App {
 				$(".getsDirty").removeClass("isDirty");
 			}
 		});
-		//
+		// ===================
+		// Log
+		// ===================
 		this.river_.txt_log.touch();
-		this.river_.fnd_paths.push([["one", "two", "three"], ["one", "two", "four"], ["aaa", "bbb", "ccc"], ["aaa", "bbb", "ddd"]]);
+		// ===================
+		// Finder
+		// ===================
+		this.river_.fnd_paths.touch();
+		this.river_.ul_keys.onValue(v => {
+			console.log(1111, "ul_keys onValue", v);
+			const paths = v.map(each => each.split("/"));
+			console.log(2222, "paths", paths);
+			this.river_.fnd_paths.push(paths);
+		});
 		this.river_.selection_fnd_paths.onValue(v => this.river_.txt_log.push(v));
+		this.river_.selection_fnd_paths.onValue(v => this.river_.selection_ul_keys.uPush(v.join("/")));
+		this.river_.selection_ul_keys.onValue(v => this.river_.selection_fnd_paths.uPush(v.split("/")));
 	}
 
 	save() {
@@ -166,13 +191,14 @@ class App {
 	}
 
 	main() {
+		console.log("9999", "==== main() ====");
 		renderEngine.render(this.river_);
 		this.updateKeys();
 		$("#btn_Save").addClass("getsDirty");
 		$("#btn_save").addClass("getsDirty");
 		this.read("Todo");
-	};
-};
+	}
+}
 
 const app = new App();
 $(document).ready(() => {

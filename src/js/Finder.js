@@ -5,19 +5,12 @@ class FinderColumn {
 	//========================================================
 	// initialize
 	//========================================================
-	constructor(iIndex, asKeys, sSelectedKey, fEventColumnSelected) {
+	constructor(iIndex, asKeys, sSelectedKey) {
 		// fEventColumnSelected(iIndex, sKey)
 		this.index_ = iIndex;
 		this.keys_ = asKeys;
 		this.selectedKey_ = sSelectedKey;
-		this.eventColumnSelected_ = fEventColumnSelected;
 		this.name_ = "FinderColumn";
-	}
-
-	eventOnClick(event) {
-		const index = event.target.getAttribute("data-index");
-		const key = this.props.column.keys[index];
-		this.props.eventColumnSelected(this.props.column.index, key);
 	}
 
 	renderOn($finder) {
@@ -29,7 +22,7 @@ class FinderColumn {
 			}
 			elementsString += `<li ${classString} data-column-index="${this.index_}" data-key-index="${index}">${each}</li>`;
 		});
-		const columnString = `<div id=${this.id_} class="FinderColumn"><ul>${elementsString}</ul></div>`;
+		const columnString = `<div class="FinderColumn"><ul>${elementsString}</ul></div>`;
 		$finder.append(columnString);
 	}
 }
@@ -39,12 +32,13 @@ export default class Finder {
 	// initialize
 	//========================================================
 	constructor(sId, $container, zPaths, zSelectedPath) {
-		console.log(2222);
+		console.log(8888, "Finder constructor");
 		this.id_ = sId;
 		this.container_ = $container;
 		this.pathsStream_ = zPaths;
 		this.selectedPathStream_ = zSelectedPath;
 		this.pathsStream_.onValue(v => {
+			console.log("2222", "pathsStream_ onValue", v);
 			this.render();
 		});
 		this.selectedPathStream_.onValue(v => {
@@ -55,14 +49,23 @@ export default class Finder {
 	//========================================================
 	// events
 	//========================================================
-	eventColumnSelected(iIndex, sKey) {
-		const oldPath = this.columns_.map(each => each.selected);
+	eventElementSelectedLogic(iIndex, sKey) {
+		console.log(1111, iIndex, sKey);
+		const oldPath = this.columns_.map(each => each.selectedKey_);
 		const newPartialPath = oldPath.slice(0, iIndex);
+		console.log(2222, oldPath, newPartialPath);
 		newPartialPath.push(sKey);
-		const newTempColumns = this.getColumns(this.props.aasPaths, newPartialPath, 0);
-		const newExtendedPath = newTempColumns.map(each => each.selected);
-		const newPath = newExtendedPath.filter(each => !(each === "----"));
-		this.props.eventPathSelected(newPath);
+		console.log(3333, newPartialPath);
+		const newTempColumns = this.getColumns(this.pathsStream_.value(), newPartialPath);
+		const newFullExtendedPath = newTempColumns.map(each => each.selectedKey_);
+		const newFullPath = newFullExtendedPath.filter(each => !(each === "----"));
+		console.log(4444, newFullPath);
+		this.selectedPathStream_.uPush(newFullPath);
+	}
+
+	eventElementSelected(oJQueryEvent) {
+		const element = oJQueryEvent.target;
+		this.eventElementSelectedLogic(element.dataset.columnIndex, element.textContent);
 	}
 
 	render() {
@@ -70,10 +73,24 @@ export default class Finder {
 	}
 
 	renderOn($container) {
-		const $finder = $(`<div id="${this.id_}" class="Finder"></div>`);
-		$container.prepend($finder);
+		console.log(6666, "renderOn");
+		let $finder = $(`#${this.id_}`);
+		if ($finder.length) {
+			console.log(7777, "exists");
+			// exists
+			$finder.empty();
+		} else {
+			console.log(7777, "does not exist", $container);
+			// does not exist
+			$finder = $(`<div id="${this.id_}" class="Finder"></div>`);
+			$container.prepend($finder);
+			const handler = this.eventElementSelected.bind(this);
+			// https://api.jquery.com/on/
+			// https://stackoverflow.com/questions/16383718/are-there-any-drawbacks-to-listen-events-on-document-level-in-jquery
+			$finder.on("click", `li`, handler);
+		}
 		this.columns_ = this.getColumns(this.pathsStream_.value([]), this.selectedPathStream_.value([]), 0);
-		this.columns_.forEach(each => each.renderOn($finder));
+		this.columns_.forEach((each) => each.renderOn($finder));
 	}
 
 	//================================================
@@ -100,10 +117,12 @@ export default class Finder {
 	}
 
 	static getColumns(aasPaths, asPath, index = 0) {
-		console.log(3333, aasPaths, asPath, index);
+		if (index === 0) {
+			console.log(9999, "getColumns", asPath);
+		}
 		//count is used in recursive calls to avoid infinite loops from errors
 		if (index > 20) {
-			return ["ERROR"];
+			return ["INFINITE LOOP ERROR"];
 		}
 		//if there are no paths, there are no columns
 		if (aasPaths.length === 0) {
