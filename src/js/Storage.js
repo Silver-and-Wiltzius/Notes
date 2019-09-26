@@ -4,7 +4,7 @@ class Storage {
 	}
 
 	// =========================
-	// API
+	// Storage API
 	// =========================
 	setItem(sKey, sText, zKeys) {
 		localStorage.setItem(this.prefix_ + sKey, sText);
@@ -16,7 +16,7 @@ class Storage {
 
 	getItem(sKey, zResult) {
 		const result = localStorage.getItem(this.prefix_ + sKey);
-		if(zResult) {
+		if (zResult) {
 			zResult.cuPush(result);
 		}
 		return result;
@@ -25,7 +25,7 @@ class Storage {
 	getAllItems(zResult) {
 		const result = [];
 		this.getKeys().forEach(each => result.push(this.getItem(each)));
-		if(zResult) {
+		if (zResult) {
 			zResult.cuPush(result);
 		}
 		return result;
@@ -39,8 +39,14 @@ class Storage {
 		return this;
 	}
 
-	getKeys() {
-		return (Object.keys(localStorage)).filter(each => each.startsWith(this.prefix_)).map(each => this.removePrefix(each, this.prefix_));
+	getKeys(zResult) {
+		const result = (Object.keys(localStorage))
+			.filter(each => each.startsWith(this.prefix_))
+			.map(each => this.removePrefix(each, this.prefix_));
+		if (zResult) {
+			zResult.cuPush(result);
+		}
+		return result;
 	}
 
 	// =========================

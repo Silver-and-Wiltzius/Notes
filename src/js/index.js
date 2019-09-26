@@ -1,64 +1,7 @@
 import F from "./Factory";
 import $ from "jquery";
 import moment from "moment";
-import * as firebase from "firebase";
 
-if (navigator.onLine) {
-	// Initialize Cloud Firestore through Firebase
-	const firebaseConfig = {
-		apiKey: "AIzaSyCp4qUEkR4skyeoXMv8JmX17q3pq09_OJM",
-		authDomain: "notes-6b42b.firebaseapp.com",
-		databaseURL: "https://notes-6b42b.firebaseio.com",
-		projectId: "notes-6b42b",
-		storageBucket: "notes-6b42b.appspot.com",
-		messagingSenderId: "594485884291",
-		appId: "1:594485884291:web:150a5ec084c0f3705cf2b6",
-	};
-	firebase.initializeApp(firebaseConfig);
-	// Authorize Cloud Firestore
-	const provider = new firebase.auth.GoogleAuthProvider();
-	console.log(3333, provider);
-	firebase.auth().signInWithPopup(provider).then(function (result) {
-		// This gives you a Google Access Token. You can use it to access the Google API.
-		const token = result.credential.accessToken;
-		console.log(4444, token);
-		// The signed-in user info.
-		const user = result.user;
-		console.log(5555, user);
-		// ...
-	}).catch(function (error) {
-		// Handle Errors here.
-		const errorCode = error.code;
-		const errorMessage = error.message;
-		// The email of the user's account used.
-		const email = error.email;
-		// The firebase.auth.AuthCredential type that was used.
-		const credential = error.credential;
-		// ...
-	});
-	// firebase.auth().signInWithEmailAndPassword("stanley.silver@yahoo.com", "123456")
-	// 	.then(() => {
-	// 		console.log("Firestore: Sign in success");
-	// 	})
-	// 	.catch((error) => {
-	// 		console.log("Firestore: Sign in error", error.code, error.message);
-	// 	});
-	//Enable persistence
-	firebase.firestore().enablePersistence()
-		.then(() => {
-			console.log("Firestore: enablePersistence() success");
-		})
-		.catch(function (error) {
-			if (error.code === "failed-precondition") {
-				console.log("Firestore Error: Multiple tabs open, persistence can only be enabled in one tab at a a time.");
-			} else if (error.code === "unimplemented") {
-				console.log("The current browser does not support all of the features required to enable persistence");
-			}
-		});
-	// Set db
-	window.db = firebase.firestore();
-}
-console.log(7777, "db", db);
 console.log("start index.js");
 //
 // ===============
@@ -67,6 +10,9 @@ console.log("start index.js");
 const renderEngine = new F.RenderEngine();
 const testRunner = new F.TestRunner();
 window.storage = new F.Storage("R10_");
+window.storageFirestore = new F.StorageFirestore();
+//
+console.log(7777, "db", storageFirestore.db);
 // ===============
 // app
 // ===============
@@ -208,16 +154,11 @@ class App {
 			alert("No Search paramters entered!");
 			return;
 		}
-		;
 		const results = this.searchLogic(terms, texts, keys);
 		if (results.length < 1) {
 			alert("No notes matched the search paramters.");
 			return;
 		}
-		// $('#ul_keys').empty();
-		// results.forEach(function(result){
-		// 	$('#ul_keys').append('<li>' + result + '</li>')
-		// });
 		this.river_.ul_keys.push(results);
 	};
 
@@ -230,7 +171,7 @@ class App {
 					test.push(term);
 				}
 			});
-			if (test.length == terms.length) {
+			if (test.length === terms.length) {
 				const index = texts.indexOf(text);
 				results.push(keys[index]);
 			}
