@@ -11,8 +11,6 @@ const renderEngine = new F.RenderEngine();
 const testRunner = new F.TestRunner();
 window.storage = new F.Storage("R10_");
 window.storageFirestore = new F.StorageFirestore();
-//
-console.log(7777, "db", storageFirestore.db);
 // ===============
 // app
 // ===============
@@ -36,7 +34,9 @@ class App {
 		this.river_.btn_backup.onValue(() => this.backup());
 		this.river_.btn_print.onValue(() => this.print());
 		this.river_.btn_delete.onValue(() => this.remove());
-		this.river_.btn_keys.label("???").onValue(() => console.log(1111, storage.getKeys()));
+		this.river_.btn_test1.label("TEST 1").onValue(() => this.test1());
+		this.river_.btn_test2.label("TEST 2").onValue(() => this.test2());
+		this.river_.btn_test3.label("TEST 3").onValue(() => this.test3());
 		this.river_.btn_runTests.onValue(() => testRunner.runTests(this.river_.txt_log));
 		// ===================
 		// Search
@@ -175,13 +175,58 @@ class App {
 				const index = texts.indexOf(text);
 				results.push(keys[index]);
 			}
-			;
 		});
 		return results;
 	}
 
+	test1() {
+		console.log("Starting firestore test1");
+		storageFirestore.db.collection("Notes")
+			.doc("Example_One")
+			.get()
+			.then((doc) => {
+				if (doc.exists) {
+					console.log("Document id, data():", doc.id, doc.data());
+				} else {
+					// doc.data() will be undefined in this case
+					console.log("No such document!");
+				}
+			})
+			.catch((error) => {
+				console.log("Error getting document:", error);
+			});
+	}
+
+	test2() {
+		console.log("Starting firestore test2");
+		const text = this.river_.txt_text.value();
+		const key = text.split("\n")[0];
+		storageFirestore.db.collection("Notes")
+			.doc(key)
+			.set({text: text})
+			.then(function () {
+				console.log("Document successfully written!");
+			})
+			.catch(function (error) {
+				console.error("Error writing document: ", error);
+			});
+	}
+
+	test3() {
+		console.log("Starting firestore test3");
+		storageFirestore.db.collection("Notes").get()
+			.then(function (snapshotNotes) {
+				const result = [];
+				snapshotNotes.forEach(function (eachDoc) {result.push(eachDoc.id)});
+				console.log("Document ids", result);
+			})
+			.catch(function (error) {
+				console.error("Error reading keys: ", error);
+			});
+	}
+
 	main() {
-		console.log("9999", "==== main() ====");
+		console.log("==== main() ====");
 		renderEngine.render(this.river_);
 		this.updateKeys();
 		$("#btn_Save").addClass("getsDirty");

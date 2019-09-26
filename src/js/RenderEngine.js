@@ -24,10 +24,7 @@ class RenderEngine {
 	render(river) {
 		const streamKeys = Object.keys(river.self_);
 		streamKeys.filter(each => each.startsWith("btn_")).forEach(each => {
-			const id = each;
-			const label = river[each].label() || this.labelFromIndex(each);
-			$("#buttons").append(`<button id="${id}" class="Button">${label}</button>`);
-			$(`#${id}`).click(event => river[each].push(event));
+			this.renderButton(each, river);
 		});
 		streamKeys.filter(each => each.startsWith("form_")).forEach(each => {
 			const id = each;
@@ -77,11 +74,17 @@ class RenderEngine {
 		streamKeys.filter(each => each.startsWith("fnd_")).forEach(each => {
 			const id = each;
 			const selectionKey = "selection_" + each;
-			// constructor(sId, $container, zPaths, zSelectedPath) {
-			console.log(5555, each, river[each]);
 			const finder = new Finder(id, $("#panes"), river[each], river[selectionKey]);
 			finder.render();
 		});
+	}
+
+	renderButton(each, river) {
+		// btn_
+		const id = each;
+		const label = river[each].label() || this.labelFromIndex(each);
+		$("#buttons").append(`<button id="${id}" class="Button">${label}</button>`);
+		$(`#${id}`).click(event => river[each].push(event));
 	}
 }
 

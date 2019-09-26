@@ -37,7 +37,6 @@ export default class Finder {
 		this.pathsStream_ = zPaths;
 		this.selectedPathStream_ = zSelectedPath;
 		this.pathsStream_.onValue(v => {
-			console.log("2222", "pathsStream_ onValue", v);
 			this.render();
 		});
 		this.selectedPathStream_.onValue(v => {
