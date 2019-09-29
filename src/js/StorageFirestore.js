@@ -51,33 +51,6 @@ class StorageFirestore {
 		}
 	}
 
-	// =========================
-	// Storage API
-	// =========================
-	setItem(sKey, sText, zKeys) {
-		9999;
-		if (zKeys) {
-			zKeys.cuPush(this.getKeys());
-		}
-		return this;
-	}
-
-	getItem(sKey, zResult) {
-		const result = 9999;
-		if (zResult) {
-			zResult.cuPush(result);
-		}
-		return result;
-	}
-
-	getAllItems(zResult) {
-		const result = 9999;
-		if (zResult) {
-			zResult.cuPush(result);
-		}
-		return result;
-	}
-
 	removeItem(sKey, zKeys) {
 		9999;
 		if (zKeys) {
@@ -86,12 +59,75 @@ class StorageFirestore {
 		return this;
 	}
 
-	getKeys(zResult) {
-		const result = 9999;
-		if (zResult) {
-			zResult.cuPush(result);
-		}
-		return result;
+	// =========================
+	// Utility
+	// =========================
+	toDocId(sKey) {
+		return sKey.replace(/\//g, '_');
+	}
+
+	fromDocId(sId) {
+		return sId.replace(/_/g, "/");
+	}
+
+	// =========================
+	// Storage API
+	// =========================
+	getItem(sKey, zResult, zError) {
+		this.db.collection("Notes")
+			.doc(this.toDocId(sKey))
+			.get()
+			.then((doc) => {
+				if (doc.exists) {
+					zResult.cuPush(doc.data().text);
+				} else {
+					zError.push("No such document: " + sKey);
+				}
+			})
+			.catch((error) => {
+				zError.push(error);
+			});
+	}
+
+	setItem(sKey, sText, zKeys, zError) {
+		this.db.collection("Notes")
+			.doc(this.toDocId(sKey))
+			.set({text: sText})
+			.then(() => this.getKeys(zKeys))
+			.catch((error) => zError.push(error));
+	}
+
+	getKeys(zResult, zError) {
+		this.db.collection("Notes").get()
+			.then((snapshotNotes) => {
+				const result = [];
+				snapshotNotes.forEach((eachDoc) => {
+					result.push(this.fromDocId(eachDoc.id));
+				});
+				zResult.cuPush(result);
+			})
+			.catch((error) => {
+				zError.push(error);
+			});
+	}
+
+	getAllItems(zResult, zError) {
+		this.db.collection("Notes").get()
+			.then((snapshotNotes) => {
+				const result = [];
+				snapshotNotes.forEach((eachDoc) => {
+					if (eachDoc.exists) {
+						result.push(eachDoc.data().text);
+					}
+				});
+				zResult.cuPush(result);
+			})
+			.catch((error) => {
+				zError.push(error);
+			});
+	}
+
+	static test_first() {
 	}
 }
 

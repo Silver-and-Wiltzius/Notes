@@ -10,7 +10,6 @@ console.log("start index.js");
 const renderEngine = new F.RenderEngine();
 const testRunner = new F.TestRunner();
 window.storage = new F.Storage("R10_");
-window.storageFirestore = new F.StorageFirestore();
 // ===============
 // app
 // ===============
@@ -34,9 +33,9 @@ class App {
 		this.river_.btn_backup.onValue(() => this.backup());
 		this.river_.btn_print.onValue(() => this.print());
 		this.river_.btn_delete.onValue(() => this.remove());
-		this.river_.btn_test1.label("TEST 1").onValue(() => this.test1());
-		this.river_.btn_test2.label("TEST 2").onValue(() => this.test2());
-		this.river_.btn_test3.label("TEST 3").onValue(() => this.test3());
+		// this.river_.btn_test1.label("TEST 1").onValue(() => this.test1());
+		// this.river_.btn_test2.label("TEST 2").onValue(() => this.test2());
+		// this.river_.btn_test3.label("TEST 3").onValue(() => this.test3());
 		this.river_.btn_runTests.onValue(() => testRunner.runTests(this.river_.txt_log));
 		// ===================
 		// Search
@@ -46,10 +45,12 @@ class App {
 		// ===================
 		// List
 		// ===================
-		this.river_.ul_keys.onValue(v => {
-			this.river_.selection_ul_keys.push(v[0]);
+		this.river_.paths.onValue(v => {
+			if (!v.includes(this.river_.selectedPath)) {
+				this.river_.selectedPath.push(v[0]);
+			}
 		});
-		this.river_.selection_ul_keys.onValue(v => this.read(v));
+		this.river_.selectedPath.onValue(v => this.read(v));
 		// ===================
 		// Text
 		// ===================
@@ -69,19 +70,19 @@ class App {
 		// Finder
 		// ===================
 		this.river_.fnd_paths.touch();
-		this.river_.ul_keys.onValue(v => {
+		this.river_.paths.onValue(v => {
 			const paths = v.map(each => each.split("/"));
 			this.river_.fnd_paths.push(paths);
 		});
 		this.river_.selection_fnd_paths.onValue(v => this.river_.txt_log.push(v));
-		this.river_.selection_fnd_paths.onValue(v => this.river_.selection_ul_keys.uPush(v.join("/")));
-		this.river_.selection_ul_keys.onValue(v => this.river_.selection_fnd_paths.uPush(v.split("/")));
+		this.river_.selection_fnd_paths.onValue(v => this.river_.selectedPath.uPush(v.join("/")));
+		this.river_.selectedPath.onValue(v => this.river_.selection_fnd_paths.uPush(v.split("/")));
 	}
 
 	save() {
 		const text = this.river_.txt_text.value();
 		const key = text.split("\n")[0];
-		storage.setItem(key, text, this.river_.ul_keys);
+		storage.setItem(key, text, this.river_.paths);
 		this.river_.txt_text.setClean();
 	}
 
@@ -90,14 +91,15 @@ class App {
 	}
 
 	remove() {
+		const nextKey = this.river_.paths.value()[0];
 		const text = this.river_.txt_text.value();
 		const key = text.split("\n")[0];
-		storage.removeItem(key, this.river_.ul_keys);
-		this.read(storage.getKeys()[0]);
+		storage.removeItem(key, this.river_.paths);
+		this.read(nextKey);
 	}
 
 	updateKeys() {
-		this.river_.ul_keys.uPush(storage.getKeys());
+		storage.getKeys(this.river_.paths);
 	}
 
 	saveFile(filename, data) {
@@ -159,7 +161,7 @@ class App {
 			alert("No notes matched the search paramters.");
 			return;
 		}
-		this.river_.ul_keys.push(results);
+		this.river_.paths.push(results);
 	};
 
 	searchLogic(terms, texts, keys) {
@@ -177,52 +179,6 @@ class App {
 			}
 		});
 		return results;
-	}
-
-	test1() {
-		console.log("Starting firestore test1");
-		storageFirestore.db.collection("Notes")
-			.doc("Example_One")
-			.get()
-			.then((doc) => {
-				if (doc.exists) {
-					console.log("Document id, data():", doc.id, doc.data());
-				} else {
-					// doc.data() will be undefined in this case
-					console.log("No such document!");
-				}
-			})
-			.catch((error) => {
-				console.log("Error getting document:", error);
-			});
-	}
-
-	test2() {
-		console.log("Starting firestore test2");
-		const text = this.river_.txt_text.value();
-		const key = text.split("\n")[0];
-		storageFirestore.db.collection("Notes")
-			.doc(key)
-			.set({text: text})
-			.then(function () {
-				console.log("Document successfully written!");
-			})
-			.catch(function (error) {
-				console.error("Error writing document: ", error);
-			});
-	}
-
-	test3() {
-		console.log("Starting firestore test3");
-		storageFirestore.db.collection("Notes").get()
-			.then(function (snapshotNotes) {
-				const result = [];
-				snapshotNotes.forEach(function (eachDoc) {result.push(eachDoc.id)});
-				console.log("Document ids", result);
-			})
-			.catch(function (error) {
-				console.error("Error reading keys: ", error);
-			});
 	}
 
 	main() {

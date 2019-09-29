@@ -1,5 +1,5 @@
 import TextPane from "./TextPane";
-import Finder from "./Finder";
+import {Finder} from "./Finder";
 import $ from "jquery";
 
 window.jQuery = $;
