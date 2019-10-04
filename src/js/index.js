@@ -94,6 +94,11 @@ class App {
 		this.river_.selection_fnd_paths.onValue(v => this.river_.txt_log.push(v));
 		this.river_.selection_fnd_paths.onValue(v => this.river_.selectedPath.uPush(v.join("/")));
 		this.river_.selectedPath.onValue(v => this.river_.selection_fnd_paths.uPush(v.split("/")));
+		// ===================
+		// Note Stack
+		// ===================
+		this.river_.btn_one.parentQuery_ = "#note_buttons"
+		this.river_.btn_one.onValue(v => console.log(v));
 	}
 
 	save() {
