@@ -203,6 +203,17 @@ class River {
 		});
 	}
 
+	static clear(zzRiver) {
+		const target = zzRiver.self_;
+		const keys = Object.keys(target);
+		keys.forEach((each) => {
+			// only delete stream names
+			if (each.slice(-1) !== "_") {
+				delete target[each];
+			}
+		})
+	}
+
 	static test_label(t) {
 		const river = new River();
 		const stream = river.one;

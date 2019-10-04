@@ -10,6 +10,7 @@ console.log("start index.js");
 const renderEngine = new F.RenderEngine();
 const testRunner = new F.TestRunner();
 window.storage = new F.Storage("R10_");
+window.FF = F;
 // ===============
 // app
 // ===============
@@ -23,6 +24,7 @@ class App {
 		// River
 		// ===================
 		this.river_ = new F.River();
+		this.pageRiver_ = new F.River();
 		window.river_ = this.river_;
 		// ===================
 		// Buttons
@@ -55,6 +57,7 @@ class App {
 		// Text
 		// ===================
 		this.river_.txt_text.on("eventSave", () => this.save());
+		this.river_.txt_text.onValue((v) => this.setPageButtons(v));
 		this.river_.txt_text.onDirty(bIsDirty => {
 			if (bIsDirty) {
 				$(".getsDirty").addClass("isDirty");
@@ -77,6 +80,13 @@ class App {
 		this.river_.selection_fnd_paths.onValue(v => this.river_.txt_log.push(v));
 		this.river_.selection_fnd_paths.onValue(v => this.river_.selectedPath.uPush(v.join("/")));
 		this.river_.selectedPath.onValue(v => this.river_.selection_fnd_paths.uPush(v.split("/")));
+
+		// ===================
+		// Finder
+		// ===================
+		this.river_.error.onValue((v) => {
+			this.river_.txt_log.push(v.toString());
+		})
 	}
 
 	save() {
@@ -87,7 +97,7 @@ class App {
 	}
 
 	read(sKey) {
-		storage.getItem(sKey, this.river_.txt_text);
+		storage.getItem(sKey, this.river_.txt_text, this.river_.error);
 	}
 
 	remove() {
@@ -179,6 +189,17 @@ class App {
 			}
 		});
 		return results;
+	}
+
+	setPageButtons(sText) {
+
+		F.River.clear(this.pageRiver_);
+		this.pageRiver_.btn2_google.parentQuery_ = "#pageButtons";
+		this.pageRiver_.btn2_google.onValue(() => {
+			alert("Google");
+		});
+		renderEngine.clear("#pageButtons");
+		renderEngine.render(this.pageRiver_);
 	}
 
 	main() {

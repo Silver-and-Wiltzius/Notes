@@ -26,6 +26,9 @@ class RenderEngine {
 		streamKeys.filter(each => each.startsWith("btn_")).forEach(each => {
 			this.renderButton(each, river);
 		});
+		streamKeys.filter(each => each.startsWith("btn2_")).forEach(each => {
+			this.renderButton2(river[each]);
+		});
 		streamKeys.filter(each => each.startsWith("form_")).forEach(each => {
 			const id = each;
 			const label = river[each].label() || this.labelFromIndex(each);
@@ -85,6 +88,30 @@ class RenderEngine {
 		const label = river[each].label() || this.labelFromIndex(each);
 		$("#buttons").append(`<button id="${id}" class="Button">${label}</button>`);
 		$(`#${id}`).click(event => river[each].push(event));
+	}
+
+	renderButton2(zButton) {
+		// btn2_
+		const streamName = zButton.name_;
+		const parentQuery = zButton.parentQuery_ || "#buttons";
+		const label = zButton.label() || this.labelFromIndex(streamName);
+		$(parentQuery).append(`<button id="${streamName}" class="Button">${label}</button>`);
+		$(`#${streamName}`).click(event => zButton.push(event));
+	}
+
+	// setLinks(sText) {
+	// 	const result = [];
+	// 	const callback = (o) => {
+	// 		result.push(<a className="KnowtLink KnowtWebLink" key={o.dataPath[1]} target="_blank"
+	// 		href={o.dataPath[2]}>{o.dataPath[1]}</a>);
+	// 	};
+	// 	//single knowt (text:)
+	// 	this.app.forEachDataPath({text: sText, name: "Link", f: callback});
+	// 	this.setState({knowtLinks: result});
+	// }
+
+	clear(sQuery) {
+		$(sQuery).empty();
 	}
 }
 
