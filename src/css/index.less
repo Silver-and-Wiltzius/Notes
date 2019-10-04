@@ -40,21 +40,21 @@ textarea {
 /* Colors
 /* ================================ */
 
-@appColor: #d70;
-@appColor2: #a70;
+@appColor: rgb(219, 219, 219);
+@appColor2: rgb(58, 180, 139);
 
-@textColor: #fb0;
-@textDirtyColor: #c99;
-@listColor: #f90;
+@textColor: @buttonColor;
+// @textDirtyColor: #c99;
+// @listColor: #f90;
 
-@buttonColor: #aa0;
+@buttonColor: rgb(62, 192, 186);
 @codeButtonColor: #d95;
 @systemButtonColor: #00a;
 @searchButtonColor: #fd0;
 @testButtonColor: #0aa;
 
-@hoverColor: #f77;
-@selectedColor: #944;
+@hoverColor: @appColor2;
+@selectedColor: @buttonColor;
 
 @cleanColor: #3d3;
 @dirtyColor: #d33;
@@ -167,7 +167,7 @@ input {
 }
 
 #ul_keys li:hover, .FinderColumn li:hover {
-  background-color: brown;
+  background-color: @hoverColor;
 }
 
 #divHeader {
@@ -220,11 +220,11 @@ input {
 }
 
 .ListPane .selected {
-  background-color: orange;
+  background-color: @selectedColor;
 }
 
 .Finder .selected {
-  background-color: orange;
+  background-color: @selectedColor;
 }
 
 .log {

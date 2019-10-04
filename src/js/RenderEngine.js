@@ -29,6 +29,9 @@ class RenderEngine {
 		streamKeys.filter(each => each.startsWith("btn2_")).forEach(each => {
 			this.renderButton2(river[each]);
 		});
+		streamKeys.filter(each => each.startsWith("tbn_")).forEach(each => {
+			this.renderButton(each, river);
+		});
 		streamKeys.filter(each => each.startsWith("form_")).forEach(each => {
 			const id = each;
 			const label = river[each].label() || this.labelFromIndex(each);
@@ -86,7 +89,8 @@ class RenderEngine {
 		// btn_
 		const id = each;
 		const label = river[each].label() || this.labelFromIndex(each);
-		$("#buttons").append(`<button id="${id}" class="Button">${label}</button>`);
+		const parentQuery = river[each].parentQuery_ || "#buttons";
+		$(parentQuery).append(`<button id="${id}" class="Button">${label}</button>`);
 		$(`#${id}`).click(event => river[each].push(event));
 	}
 

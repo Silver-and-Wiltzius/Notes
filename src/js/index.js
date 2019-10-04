@@ -1,6 +1,8 @@
 import F from "./Factory";
 import $ from "jquery";
 import moment from "moment";
+import { River } from "./River";
+import yaml from "js-yaml";
 
 console.log("start index.js");
 //
@@ -39,6 +41,21 @@ class App {
 		// this.river_.btn_test2.label("TEST 2").onValue(() => this.test2());
 		// this.river_.btn_test3.label("TEST 3").onValue(() => this.test3());
 		this.river_.btn_runTests.onValue(() => testRunner.runTests(this.river_.txt_log));
+		// ===================
+		// Toggle Buttons
+		// ===================
+		this.river_.tbn_setColor.parentQuery_ = "#t_buttons"
+		this.river_.tbn_setColor.toggled_ = false;
+		this.river_.tbn_setColor.onValue(v => {
+			const toggleState = this.river_.tbn_setColor.toggled_;
+			if (toggleState) {
+			   $("#tbn_setColor").css("backgroundColor", "red");
+			   this.river_.tbn_setColor.toggled_ = false;
+			} else {
+			   $("#tbn_setColor").css("backgroundColor", "green");
+			   this.river_.tbn_setColor.toggled_ = true;
+			}
+		});
 		// ===================
 		// Search
 		// ===================
@@ -86,7 +103,12 @@ class App {
 		// ===================
 		this.river_.error.onValue((v) => {
 			this.river_.txt_log.push(v.toString());
-		})
+		});
+		// ===================
+		// Note Stack
+		// ===================
+		this.river_.btn_one.parentQuery_ = "#note_buttons"
+		this.river_.btn_one.onValue(v => console.log(v));
 	}
 
 	save() {
