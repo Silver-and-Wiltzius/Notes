@@ -36,9 +36,7 @@ class App {
 		this.river_.btn_rename.label("Rename").onValue(() => console.log("Rename"));
 		this.river_.btn_todo.onValue(() => this.read("Todo"));
 		this.river_.btn_backup.onValue(() => {
-			console.log(1111);
 			storage.getAllItems(null, this.river_.error).then((asTexts) => {
-				console.log(2222);
 				utility.backup("orangeNotes", asTexts);
 			});
 		});
@@ -68,15 +66,7 @@ class App {
 		// ===================
 		this.river_.form_search;
 		this.river_.btn_search.onValue(() => this.search());
-		// ===================
-		// List
-		// ===================
-		this.river_.paths.onValue(v => {
-			if (!v.includes(this.river_.selectedPath)) {
-				this.river_.selectedPath.push(v[0]);
-			}
-		});
-		this.river_.selectedPath.onValue(v => this.read(v));
+
 		// ===================
 		// Text
 		// ===================
@@ -93,6 +83,23 @@ class App {
 		// Log
 		// ===================
 		this.river_.txt_log.touch();
+		// ===================
+		// Paths
+		// ===================
+		this.river_.paths.onValue(v => {
+			const oldSelectedPath = this.river_.selectedPath.value();
+			if (!v.includes(oldSelectedPath)) {
+				const sorted = _.sortBy(v);
+				sorted.forEach((each, index) => {
+					if (each > oldSelectedPath) {
+						const newSelectedPath = index === 0 ? v[1] : v[index-1];
+						this.river_.selectedPath.uPush(newSelectedPath);
+						return null;
+					}
+				})
+			}
+		});
+		this.river_.selectedPath.onValue(v => this.read(v));
 		// ===================
 		// Finder
 		// ===================
@@ -120,8 +127,9 @@ class App {
 	save() {
 		const text = this.river_.txt_text.value();
 		const key = text.split("\n")[0];
-		storage.setItem(key, text, this.river_.paths);
+		storage.setItem(key, text, this.river_.paths, this.river_.error);
 		this.river_.txt_text.setClean();
+		this.river_.selectedPath.uPush(key);
 	}
 
 	read(sKey) {
@@ -129,15 +137,13 @@ class App {
 	}
 
 	remove() {
-		const nextKey = this.river_.paths.value()[0];
 		const text = this.river_.txt_text.value();
 		const key = text.split("\n")[0];
-		storage.removeItem(key, this.river_.paths);
-		this.read(nextKey);
+		storage.removeItem(key, this.river_.paths, this.river_.error);
 	}
 
 	updateKeys() {
-		storage.getKeys(this.river_.paths);
+		storage.getKeys(this.river_.paths, this.river_.error);
 	}
 
 	search() {

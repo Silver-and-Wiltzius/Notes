@@ -100,6 +100,16 @@ class StorageFirestore {
 			.catch((error) => zError && zError.push(error));
 	}
 
+	removeItem(sKey, zKeys, zError) {
+		return this.db.collection("Notes")
+			.doc(this.toDocId(sKey))
+			.delete()
+			.then(() => {
+				return this.getKeys(zKeys, zError);
+			})
+			.catch((error) => zError && zError.push(error));
+	}
+
 	getKeys(zResult, zError) {
 		return this.db.collection("Notes").get()
 			.then((snapshotNotes) => {
@@ -107,6 +117,7 @@ class StorageFirestore {
 				snapshotNotes.forEach((eachDoc) => {
 					result.push(this.fromDocId(eachDoc.id));
 				});
+				console.log(1111, result);
 				zResult && zResult.uPush(result);
 				return result;
 			})

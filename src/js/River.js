@@ -1,4 +1,5 @@
 import _ from "lodash";
+window._ = _;
 
 class Stream {
 	constructor(sName = "Stream", oRiver = {name_: "River"}) {
