@@ -11,7 +11,7 @@ const Factory = {
 	TestEngine: TestEngine,
 	TestRunner: TestRunner,
 	RenderEngine: RenderEngine,
-	Storage: Storage,
+	Storage: StorageFirestore,
 	StorageFirestore: StorageFirestore,
 	Finder: Finder,
 	classes: function () {

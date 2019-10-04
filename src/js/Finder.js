@@ -27,7 +27,7 @@ class FinderColumn {
 	}
 }
 
-export default class Finder {
+class Finder {
 	//========================================================
 	// initialize
 	//========================================================
@@ -166,3 +166,5 @@ export default class Finder {
 		t.eq(resultJSON, desired);
 	}
 }
+
+export {Finder};

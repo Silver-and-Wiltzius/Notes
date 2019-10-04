@@ -12,7 +12,6 @@ console.log("start index.js");
 const renderEngine = new F.RenderEngine();
 const testRunner = new F.TestRunner();
 window.storage = new F.Storage("R10_");
-window.storageFirestore = new F.StorageFirestore();
 // ===============
 // app
 // ===============
@@ -36,9 +35,9 @@ class App {
 		this.river_.btn_backup.onValue(() => this.backup());
 		this.river_.btn_print.onValue(() => this.print());
 		this.river_.btn_delete.onValue(() => this.remove());
-		this.river_.btn_test1.label("TEST 1").onValue(() => this.test1());
-		this.river_.btn_test2.label("TEST 2").onValue(() => this.test2());
-		this.river_.btn_test3.label("TEST 3").onValue(() => this.test3());
+		// this.river_.btn_test1.label("TEST 1").onValue(() => this.test1());
+		// this.river_.btn_test2.label("TEST 2").onValue(() => this.test2());
+		// this.river_.btn_test3.label("TEST 3").onValue(() => this.test3());
 		this.river_.btn_runTests.onValue(() => testRunner.runTests(this.river_.txt_log));
 		// ===================
 		// Toggle Buttons
@@ -63,10 +62,12 @@ class App {
 		// ===================
 		// List
 		// ===================
-		this.river_.ul_keys.onValue(v => {
-			this.river_.selection_ul_keys.push(v[0]);
+		this.river_.paths.onValue(v => {
+			if (!v.includes(this.river_.selectedPath)) {
+				this.river_.selectedPath.push(v[0]);
+			}
 		});
-		this.river_.selection_ul_keys.onValue(v => this.read(v));
+		this.river_.selectedPath.onValue(v => this.read(v));
 		// ===================
 		// Text
 		// ===================
@@ -86,26 +87,19 @@ class App {
 		// Finder
 		// ===================
 		this.river_.fnd_paths.touch();
-		this.river_.ul_keys.onValue(v => {
+		this.river_.paths.onValue(v => {
 			const paths = v.map(each => each.split("/"));
 			this.river_.fnd_paths.push(paths);
 		});
 		this.river_.selection_fnd_paths.onValue(v => this.river_.txt_log.push(v));
-		this.river_.selection_fnd_paths.onValue(v => this.river_.selection_ul_keys.uPush(v.join("/")));
-		this.river_.selection_ul_keys.onValue(v => this.river_.selection_fnd_paths.uPush(v.split("/")));
-		// ===================
-		// Card buttons
-		// ===================
-		this.river_.btn_NewCard.parentQuery_ = "#card_buttons"
-		this.river_.btn_NewCard.onValue(() => this.testCards());
-		this.river_.btn_Correct.parentQuery_ = "#card_buttons"
-		this.river_.btn_Wrong.parentQuery_ = "#card_buttons"
+		this.river_.selection_fnd_paths.onValue(v => this.river_.selectedPath.uPush(v.join("/")));
+		this.river_.selectedPath.onValue(v => this.river_.selection_fnd_paths.uPush(v.split("/")));
 	}
 
 	save() {
 		const text = this.river_.txt_text.value();
 		const key = text.split("\n")[0];
-		storage.setItem(key, text, this.river_.ul_keys);
+		storage.setItem(key, text, this.river_.paths);
 		this.river_.txt_text.setClean();
 	}
 
@@ -114,14 +108,15 @@ class App {
 	}
 
 	remove() {
+		const nextKey = this.river_.paths.value()[0];
 		const text = this.river_.txt_text.value();
 		const key = text.split("\n")[0];
-		storage.removeItem(key, this.river_.ul_keys);
-		this.read(storage.getKeys()[0]);
+		storage.removeItem(key, this.river_.paths);
+		this.read(nextKey);
 	}
 
 	updateKeys() {
-		this.river_.ul_keys.uPush(storage.getKeys());
+		storage.getKeys(this.river_.paths);
 	}
 
 	saveFile(filename, data) {
@@ -183,7 +178,7 @@ class App {
 			alert("No notes matched the search paramters.");
 			return;
 		}
-		this.river_.ul_keys.push(results);
+		this.river_.paths.push(results);
 	};
 
 	searchLogic(terms, texts, keys) {
@@ -203,6 +198,7 @@ class App {
 		return results;
 	}
 
+<<<<<<< HEAD
 	test1() {
 		console.log("Starting firestore test1");
 		storageFirestore.db.collection("Notes")
@@ -282,6 +278,8 @@ class App {
         return delimitedText;
     }
 	
+=======
+>>>>>>> f968a2a8e52e5704b687b2d3e5b111b2c5eea8ea
 	main() {
 		console.log("==== main() ====");
 		renderEngine.render(this.river_);
