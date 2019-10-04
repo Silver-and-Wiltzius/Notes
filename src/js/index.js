@@ -1,7 +1,7 @@
 import F from "./Factory";
 import $ from "jquery";
 import moment from "moment";
-import { River } from "./River";
+import {River} from "./River";
 import yaml from "js-yaml";
 
 console.log("start index.js");
@@ -11,6 +11,7 @@ console.log("start index.js");
 // ===============
 const renderEngine = new F.RenderEngine();
 const testRunner = new F.TestRunner();
+const utility = F.Utility;
 window.storage = new F.Storage("R10_");
 window.FF = F;
 // ===============
@@ -34,8 +35,14 @@ class App {
 		this.river_.btn_save.onValue(() => this.save());
 		this.river_.btn_rename.label("Rename").onValue(() => console.log("Rename"));
 		this.river_.btn_todo.onValue(() => this.read("Todo"));
-		this.river_.btn_backup.onValue(() => this.backup());
-		this.river_.btn_print.onValue(() => this.print());
+		this.river_.btn_backup.onValue(() => {
+			console.log(1111);
+			storage.getAllItems(null, this.river_.error).then((asTexts) => {
+				console.log(2222);
+				utility.backup("orangeNotes", asTexts);
+			});
+		});
+		this.river_.btn_print.onValue(() => utility.print(this.river_.txt_text.value()));
 		this.river_.btn_delete.onValue(() => this.remove());
 		// this.river_.btn_test1.label("TEST 1").onValue(() => this.test1());
 		// this.river_.btn_test2.label("TEST 2").onValue(() => this.test2());
@@ -44,16 +51,16 @@ class App {
 		// ===================
 		// Toggle Buttons
 		// ===================
-		this.river_.tbn_setColor.parentQuery_ = "#t_buttons"
+		this.river_.tbn_setColor.parentQuery_ = "#t_buttons";
 		this.river_.tbn_setColor.toggled_ = false;
 		this.river_.tbn_setColor.onValue(v => {
 			const toggleState = this.river_.tbn_setColor.toggled_;
 			if (toggleState) {
-			   $("#tbn_setColor").css("backgroundColor", "red");
-			   this.river_.tbn_setColor.toggled_ = false;
+				$("#tbn_setColor").css("backgroundColor", "red");
+				this.river_.tbn_setColor.toggled_ = false;
 			} else {
-			   $("#tbn_setColor").css("backgroundColor", "green");
-			   this.river_.tbn_setColor.toggled_ = true;
+				$("#tbn_setColor").css("backgroundColor", "green");
+				this.river_.tbn_setColor.toggled_ = true;
 			}
 		});
 		// ===================
@@ -97,9 +104,8 @@ class App {
 		this.river_.selection_fnd_paths.onValue(v => this.river_.txt_log.push(v));
 		this.river_.selection_fnd_paths.onValue(v => this.river_.selectedPath.uPush(v.join("/")));
 		this.river_.selectedPath.onValue(v => this.river_.selection_fnd_paths.uPush(v.split("/")));
-
 		// ===================
-		// Finder
+		// Errors
 		// ===================
 		this.river_.error.onValue((v) => {
 			this.river_.txt_log.push(v.toString());
@@ -107,7 +113,7 @@ class App {
 		// ===================
 		// Note Stack
 		// ===================
-		this.river_.btn_one.parentQuery_ = "#note_buttons"
+		this.river_.btn_one.parentQuery_ = "#note_buttons";
 		this.river_.btn_one.onValue(v => console.log(v));
 	}
 
@@ -133,51 +139,6 @@ class App {
 	updateKeys() {
 		storage.getKeys(this.river_.paths);
 	}
-
-	saveFile(filename, data) {
-		const blob = new Blob([data], {type: "text/text"});
-		const element = window.document.createElement("a");
-		const url = window.URL.createObjectURL(blob);
-		element.href = url;
-		element.download = filename;
-		document.body.appendChild(element);
-		element.click();
-		document.body.removeChild(element);
-		window.URL.revokeObjectURL(url);
-	}
-
-	backup() {
-		const delimiter = "\n===||===||===\n";
-		const texts = storage.getAllItems();
-		const date = moment().format("YYYYMMDD[]HHmm");
-		const filename = "knowts" + date + ".txt";
-		const text = filename + delimiter + texts.join(delimiter);
-		this.saveFile(filename, text);
-	};
-
-	print() {
-		//don't know how to get rid of first indent in print window
-		const text = this.river_.txt_text.value();
-		if (!text) {
-			alert("No selected knowt");
-			return this;
-		}
-		const html = `
-			<style>
-				.plainText {
-					white-space: pre-wrap;
-				}
-			</style>
-			<div class="plainText">
-			${text}
-			</div>`;
-		const newWindow = window.open("", "PrintWindow", "width=500,height=500,top=200,left=200,menubar=no,toolbars=no,scrollbars=no,status=no,resizable=no");
-		newWindow.document.writeln(html);
-		newWindow.document.close();
-		newWindow.focus();
-		newWindow.print();
-		newWindow.close();
-	};
 
 	search() {
 		const terms = $("#form_search").val().toLowerCase().split(" ");
@@ -214,7 +175,6 @@ class App {
 	}
 
 	setPageButtons(sText) {
-
 		F.River.clear(this.pageRiver_);
 		this.pageRiver_.btn2_google.parentQuery_ = "#pageButtons";
 		this.pageRiver_.btn2_google.onValue(() => {

@@ -63,7 +63,7 @@ class StorageFirestore {
 	// Utility
 	// =========================
 	toDocId(sKey) {
-		return sKey.replace(/\//g, '_');
+		return sKey.replace(/\//g, "_");
 	}
 
 	fromDocId(sId) {
@@ -74,45 +74,47 @@ class StorageFirestore {
 	// Storage API
 	// =========================
 	getItem(sKey, zResult, zError) {
-		this.db.collection("Notes")
+		return this.db.collection("Notes")
 			.doc(this.toDocId(sKey))
 			.get()
 			.then((doc) => {
 				if (doc.exists) {
-					zResult.cuPush(doc.data().text);
+					const text = doc.data().text;
+					zResult && zResult.cuPush(text);
+					return text;
 				} else {
-					zError.push("No such document: " + sKey);
+					const message = "No such document: " + sKey;
+					return Promise.reject(message);
 				}
 			})
-			.catch((error) => {
-				zError.push(error);
-			});
+			.catch((error) => zError && zError.push(error));
 	}
 
 	setItem(sKey, sText, zKeys, zError) {
-		this.db.collection("Notes")
+		return this.db.collection("Notes")
 			.doc(this.toDocId(sKey))
 			.set({text: sText})
-			.then(() => this.getKeys(zKeys))
-			.catch((error) => zError.push(error));
+			.then(() => {
+				return this.getKeys(zKeys, zError);
+			})
+			.catch((error) => zError && zError.push(error));
 	}
 
 	getKeys(zResult, zError) {
-		this.db.collection("Notes").get()
+		return this.db.collection("Notes").get()
 			.then((snapshotNotes) => {
 				const result = [];
 				snapshotNotes.forEach((eachDoc) => {
 					result.push(this.fromDocId(eachDoc.id));
 				});
-				zResult.cuPush(result);
+				zResult && zResult.uPush(result);
+				return result;
 			})
-			.catch((error) => {
-				zError.push(error);
-			});
+			.catch((error) => zError && zError.push(error));
 	}
 
 	getAllItems(zResult, zError) {
-		this.db.collection("Notes").get()
+		return this.db.collection("Notes").get()
 			.then((snapshotNotes) => {
 				const result = [];
 				snapshotNotes.forEach((eachDoc) => {
@@ -120,11 +122,10 @@ class StorageFirestore {
 						result.push(eachDoc.data().text);
 					}
 				});
-				zResult.cuPush(result);
+				zResult && zResult.uPush(result);
+				return result;
 			})
-			.catch((error) => {
-				zError.push(error);
-			});
+			.catch((error) => zError && zError.push(error));
 	}
 
 	static test_first() {

@@ -5,6 +5,7 @@ import {RenderEngine} from "./RenderEngine";
 import {Storage} from "./Storage";
 import {StorageFirestore} from "./StorageFirestore";
 import {Finder} from "./Finder";
+import {Utility} from "./Utility";
 
 const Factory = {
 	River: River,
@@ -14,6 +15,7 @@ const Factory = {
 	Storage: StorageFirestore,
 	StorageFirestore: StorageFirestore,
 	Finder: Finder,
+	Utility: Utility,
 	classes: function () {
 		return Object.values(this);
 	},
