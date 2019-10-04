@@ -53,7 +53,7 @@ class App {
 			   $("#tbn_setColor").css("backgroundColor", "green");
 			   this.river_.tbn_setColor.toggled_ = true;
 			}
-		 });
+		});
 		// ===================
 		// Search
 		// ===================
@@ -198,88 +198,6 @@ class App {
 		return results;
 	}
 
-<<<<<<< HEAD
-	test1() {
-		console.log("Starting firestore test1");
-		storageFirestore.db.collection("Notes")
-			.doc("Example_One")
-			.get()
-			.then((doc) => {
-				if (doc.exists) {
-					console.log("Document id, data():", doc.id, doc.data());
-				} else {
-					// doc.data() will be undefined in this case
-					console.log("No such document!");
-				}
-			})
-			.catch((error) => {
-				console.log("Error getting document:", error);
-			});
-	}
-
-	test2() {
-		console.log("Starting firestore test2");
-		const text = this.river_.txt_text.value();
-		const key = text.split("\n")[0];
-		storageFirestore.db.collection("Notes")
-			.doc(key)
-			.set({text: text})
-			.then(function () {
-				console.log("Document successfully written!");
-			})
-			.catch(function (error) {
-				console.error("Error writing document: ", error);
-			});
-	}
-
-	test3() {
-		console.log("Starting firestore test3");
-		storageFirestore.db.collection("Notes").get()
-			.then(function (snapshotNotes) {
-				const result = [];
-				snapshotNotes.forEach(function (eachDoc) {result.push(eachDoc.id)});
-				console.log("Document ids", result);
-			})
-			.catch(function (error) {
-				console.error("Error reading keys: ", error);
-			});
-	}
-
-	testCards() {
-		this.setNote("SR Card/Credit Cards/AMEX")
-		console.log(this.yaml(this.currentText()));
-	}
-
-	currentText() {
-		return this.river_.txt_text.value();
-	}
-
-	setNote(sKey) {
-		this.river_.selection_ul_keys.push(sKey)
-	}
-
-	////////////////////
-	//utility
-	////////////////////
-
-	yaml(sText, sDelimter = "=====||=====") {
-		const yamlText = this.delimitedText(sText, sDelimter);	
-		const result = yaml.safeLoad(yamlText);
-        return result;
-    }
-
-	delimitedText(sText, sDelimiter = "=====||=====") {
-        let delimitedText;
-        if (sText.includes(sDelimiter)) {
-            delimitedText = sText.slice(sText.indexOf(sDelimiter) + sDelimiter.length + 1).trim();
-        } else {
-            delimitedText = "";
-        }
-        return delimitedText;
-    }
-	
-=======
->>>>>>> f968a2a8e52e5704b687b2d3e5b111b2c5eea8ea
 	main() {
 		console.log("==== main() ====");
 		renderEngine.render(this.river_);
