@@ -1,6 +1,8 @@
 import F from "./Factory";
 import $ from "jquery";
 import moment from "moment";
+import { River } from "./River";
+import yaml from "js-yaml";
 
 console.log("start index.js");
 //
@@ -39,6 +41,21 @@ class App {
 		this.river_.btn_test3.label("TEST 3").onValue(() => this.test3());
 		this.river_.btn_runTests.onValue(() => testRunner.runTests(this.river_.txt_log));
 		// ===================
+		// Toggle Buttons
+		// ===================
+		this.river_.tbn_setColor.parentQuery_ = "#t_buttons"
+		this.river_.tbn_setColor.toggled_ = false;
+		this.river_.tbn_setColor.onValue(v => {
+			const toggleState = this.river_.tbn_setColor.toggled_;
+			if (toggleState) {
+			   $("#tbn_setColor").css("backgroundColor", "red");
+			   this.river_.tbn_setColor.toggled_ = false;
+			} else {
+			   $("#tbn_setColor").css("backgroundColor", "green");
+			   this.river_.tbn_setColor.toggled_ = true;
+			}
+		 });
+		// ===================
 		// Search
 		// ===================
 		this.river_.form_search;
@@ -76,6 +93,13 @@ class App {
 		this.river_.selection_fnd_paths.onValue(v => this.river_.txt_log.push(v));
 		this.river_.selection_fnd_paths.onValue(v => this.river_.selection_ul_keys.uPush(v.join("/")));
 		this.river_.selection_ul_keys.onValue(v => this.river_.selection_fnd_paths.uPush(v.split("/")));
+		// ===================
+		// Card buttons
+		// ===================
+		this.river_.btn_NewCard.parentQuery_ = "#card_buttons"
+		this.river_.btn_NewCard.onValue(() => this.testCards());
+		this.river_.btn_Correct.parentQuery_ = "#card_buttons"
+		this.river_.btn_Wrong.parentQuery_ = "#card_buttons"
 	}
 
 	save() {
@@ -225,6 +249,39 @@ class App {
 			});
 	}
 
+	testCards() {
+		this.setNote("SR Card/Credit Cards/AMEX")
+		console.log(this.yaml(this.currentText()));
+	}
+
+	currentText() {
+		return this.river_.txt_text.value();
+	}
+
+	setNote(sKey) {
+		this.river_.selection_ul_keys.push(sKey)
+	}
+
+	////////////////////
+	//utility
+	////////////////////
+
+	yaml(sText, sDelimter = "=====||=====") {
+		const yamlText = this.delimitedText(sText, sDelimter);	
+		const result = yaml.safeLoad(yamlText);
+        return result;
+    }
+
+	delimitedText(sText, sDelimiter = "=====||=====") {
+        let delimitedText;
+        if (sText.includes(sDelimiter)) {
+            delimitedText = sText.slice(sText.indexOf(sDelimiter) + sDelimiter.length + 1).trim();
+        } else {
+            delimitedText = "";
+        }
+        return delimitedText;
+    }
+	
 	main() {
 		console.log("==== main() ====");
 		renderEngine.render(this.river_);
