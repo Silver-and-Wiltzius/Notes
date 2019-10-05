@@ -64,7 +64,7 @@ class App {
 		// Search
 		// ===================
 		this.river_.form_search;
-		this.river_.btn_search.onValue(() => this.search());
+		this.river_.btn_search.onValue(() => this.search($("#form_search").val().split(" ")));
 		// ===================
 		// Text
 		// ===================
@@ -89,13 +89,14 @@ class App {
 			const oldSelectedPath = this.river_.selectedPath.value();
 			if (!v.includes(oldSelectedPath)) {
 				let done = false;
+				let newSelectedPath = v[0];
 				v.forEach((each, index) => {
 					if (!done && each > oldSelectedPath) {
-						const newSelectedPath = index === 0 ? v[0] : v[index - 1];
-						this.river_.selectedPath.uPush(newSelectedPath);
+						newSelectedPath = index === 0 ? v[0] : v[index - 1];
 						done = true;
 					}
 				});
+				this.river_.selectedPath.uPush(newSelectedPath);
 			}
 		});
 		this.river_.selectedPath.onValue(v => this.read(v));
@@ -119,8 +120,8 @@ class App {
 		// ===================
 		// Note Stack
 		// ===================
-		this.river_.btn_one.parentQuery_ = "#note_buttons";
-		this.river_.btn_one.onValue(v => console.log(v));
+		this.river_.btn_today.parentQuery_ = "#note_buttons";
+		this.river_.btn_today.onValue(v => this.search(['@@|class|MemCard', new Date().toDateString()]));
 		// ===================
 		// Link Buttons
 		// ===================
@@ -176,21 +177,32 @@ class App {
 		});
 	}
 
-	search() {
-		const terms = $("#form_search").val().toLowerCase().split(" ");
-		const texts = storage.getAllItems();
-		const keys = storage.getKeys();
-		console.log(keys);
-		if (terms.length < 2 && terms[0] == "") {
-			alert("No Search paramters entered!");
-			return;
-		}
-		const results = this.searchLogic(terms, texts, keys);
-		if (results.length < 1) {
-			alert("No notes matched the search paramters.");
-			return;
-		}
-		this.river_.paths.push(results);
+
+	search(asTerms) {
+		const result = [];
+		this.forEachKeyAndText((sKey, sText) => {
+			if (asTerms.every((each) => sText.toLowerCase().includes(each.toLowerCase()))) {
+				result.push(sKey);
+			}
+		}).then(() => {
+			this.river_.paths.push(result);
+		});
+
+
+		// const terms = $("#form_search").val().toLowerCase().split(" ");
+		// const texts = storage.getAllItems();
+		// const keys = storage.getKeys();
+		// console.log(keys);
+		// if (terms.length < 2 && terms[0] == "") {
+		// 	alert("No Search paramters entered!");
+		// 	return;
+		// }
+		// const results = this.searchLogic(terms, texts, keys);
+		// if (results.length < 1) {
+		// 	alert("No notes matched the search paramters.");
+		// 	return;
+		// }
+		// this.river_.paths.push(results);
 	};
 
 	searchLogic(terms, texts, keys) {
@@ -304,6 +316,7 @@ class App {
 }
 
 const app = new App();
+window.app = app;
 $(document).ready(() => {
 	app.main();
 });
