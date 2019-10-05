@@ -27,14 +27,13 @@ class App {
 		// River
 		// ===================
 		this.river_ = new F.River();
-		this.pageRiver_ = new F.River();
 		window.river_ = this.river_;
 		// ===================
 		// Buttons
 		// ===================
 		this.river_.btn_save.onValue(() => this.save());
 		this.river_.btn_rename.label("Rename").onValue(() => console.log("Rename"));
-		this.river_.btn_todo.onValue(() => this.read("Todo"));
+		this.river_.btn_todo.onValue(() => this.river_.selectedPath.uPush("Todo"));
 		this.river_.btn_backup.onValue(() => {
 			storage.getAllItems(null, this.river_.error).then((asTexts) => {
 				utility.backup("orangeNotes", asTexts);
@@ -87,14 +86,15 @@ class App {
 		// Paths
 		// ===================
 		this.river_.paths.onValue(v => {
+			v.sort();
 			const oldSelectedPath = this.river_.selectedPath.value();
 			if (!v.includes(oldSelectedPath)) {
-				const sorted = _.sortBy(v);
-				sorted.forEach((each, index) => {
-					if (each > oldSelectedPath) {
-						const newSelectedPath = index === 0 ? v[1] : v[index-1];
+				let done = false;
+				v.forEach((each, index) => {
+					if (!done && each > oldSelectedPath) {
+						const newSelectedPath = index === 0 ? v[0] : v[index-1];
 						this.river_.selectedPath.uPush(newSelectedPath);
-						return null;
+						done = true;
 					}
 				})
 			}
@@ -181,13 +181,24 @@ class App {
 	}
 
 	setPageButtons(sText) {
-		F.River.clear(this.pageRiver_);
-		this.pageRiver_.btn2_google.parentQuery_ = "#pageButtons";
-		this.pageRiver_.btn2_google.onValue(() => {
-			alert("Google");
+		const linkDataPaths = utility.getDataPaths(sText)
+			.filter((each) => each[0] === "link")
+			.map((each) => each.slice(1));
+		const tempRiver = new F.River();
+		linkDataPaths.forEach((each, index) => {
+			const id = "btn_" + index;
+			const label = each[0];
+			tempRiver[id].label(label).parentQuery_ = "#pageButtons";
 		});
 		renderEngine.clear("#pageButtons");
-		renderEngine.render(this.pageRiver_);
+		renderEngine.render(tempRiver);
+		linkDataPaths.forEach((each, index) => {
+			const query = "#btn_" + index;
+			const link = each[1];
+			$(query).on("click",function(){
+				window.open(link,"_blank");
+			});
+		});
 	}
 
 	main() {

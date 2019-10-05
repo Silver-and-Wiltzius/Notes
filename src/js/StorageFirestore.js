@@ -117,7 +117,6 @@ class StorageFirestore {
 				snapshotNotes.forEach((eachDoc) => {
 					result.push(this.fromDocId(eachDoc.id));
 				});
-				console.log(1111, result);
 				zResult && zResult.uPush(result);
 				return result;
 			})
