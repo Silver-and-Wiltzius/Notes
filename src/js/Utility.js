@@ -158,8 +158,17 @@ class Utility {
 		return dataPaths;
 	}
 
+	static prepended(a, v) {
+		a.unshift(v);
+		return a;
+	}
+
 	static test_first(t) {
 		t.eq(1, 1);
+	}
+
+	static test_prepended(t) {
+		t.eq(this.prepended([22, 33], 11), [11, 22, 33]);
 	}
 
 	static test_getDataPaths(t) {
@@ -176,5 +185,4 @@ asdf`;
 }
 
 window.utility = Utility;
-
 export {Utility};

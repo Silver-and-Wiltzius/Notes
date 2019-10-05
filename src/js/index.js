@@ -33,7 +33,7 @@ class App {
 		// ===================
 		this.river_.btn_save.onValue(() => this.save());
 		this.river_.btn_rename.label("Rename").onValue(() => console.log("Rename"));
-		this.river_.btn_todo.onValue(() => this.river_.selectedPath.uPush("Todo"));
+		this.river_.btn_todo.onValue(() => this.selectKey("Todo"));
 		this.river_.btn_backup.onValue(() => {
 			storage.getAllItems(null, this.river_.error).then((asTexts) => {
 				utility.backup("orangeNotes", asTexts);
@@ -41,7 +41,7 @@ class App {
 		});
 		this.river_.btn_print.onValue(() => utility.print(this.river_.txt_text.value()));
 		this.river_.btn_delete.onValue(() => this.remove());
-		// this.river_.btn_test1.label("TEST 1").onValue(() => this.test1());
+		this.river_.btn_test1.label("TEST 1").onValue(() => this.test1());
 		// this.river_.btn_test2.label("TEST 2").onValue(() => this.test2());
 		// this.river_.btn_test3.label("TEST 3").onValue(() => this.test3());
 		this.river_.btn_runTests.onValue(() => testRunner.runTests(this.river_.txt_log));
@@ -65,12 +65,11 @@ class App {
 		// ===================
 		this.river_.form_search;
 		this.river_.btn_search.onValue(() => this.search());
-
 		// ===================
 		// Text
 		// ===================
 		this.river_.txt_text.on("eventSave", () => this.save());
-		this.river_.txt_text.onValue((v) => this.setPageButtons(v));
+		this.river_.txt_text.onValue((v) => this.setLinkButtons(v));
 		this.river_.txt_text.onDirty(bIsDirty => {
 			if (bIsDirty) {
 				$(".getsDirty").addClass("isDirty");
@@ -92,11 +91,11 @@ class App {
 				let done = false;
 				v.forEach((each, index) => {
 					if (!done && each > oldSelectedPath) {
-						const newSelectedPath = index === 0 ? v[0] : v[index-1];
+						const newSelectedPath = index === 0 ? v[0] : v[index - 1];
 						this.river_.selectedPath.uPush(newSelectedPath);
 						done = true;
 					}
-				})
+				});
 			}
 		});
 		this.river_.selectedPath.onValue(v => this.read(v));
@@ -122,11 +121,24 @@ class App {
 		// ===================
 		this.river_.btn_one.parentQuery_ = "#note_buttons";
 		this.river_.btn_one.onValue(v => console.log(v));
+		// ===================
+		// Link Buttons
+		// ===================
+		this.river_.linkButtons.onValue((v) => this.renderLinkButtons(v));
+		this.river_.bookmarkButtons.onValue((v) => this.renderBookmarkButtons(v));
+	}
+
+	selectKey(sKey) {
+		return this.river_.selectedPath.uPush(sKey);
+	}
+
+	keyFromText(sText) {
+		return sText.split("\n")[0];
 	}
 
 	save() {
 		const text = this.river_.txt_text.value();
-		const key = text.split("\n")[0];
+		const key = this.keyFromText(text);
 		storage.setItem(key, text, this.river_.paths, this.river_.error);
 		this.river_.txt_text.setClean();
 		this.river_.selectedPath.uPush(key);
@@ -138,12 +150,30 @@ class App {
 
 	remove() {
 		const text = this.river_.txt_text.value();
-		const key = text.split("\n")[0];
+		const key = this.keyFromText(text);
 		storage.removeItem(key, this.river_.paths, this.river_.error);
 	}
 
 	updateKeys() {
 		storage.getKeys(this.river_.paths, this.river_.error);
+	}
+
+	forEachKeyAndText(f) {
+		// f(sKey, sText){}
+		return storage.getAllItems()
+			.then((asTexts) => {
+				asTexts.forEach((sText) => {
+					const key = this.keyFromText(sText);
+					f(key, sText);
+				});
+				return asTexts;
+			});
+	}
+
+	test1() {
+		this.forEachKeyAndText((sKey, sText) => {
+			console.log(5555, sKey, sText.slice(0, 20));
+		});
 	}
 
 	search() {
@@ -180,34 +210,96 @@ class App {
 		return results;
 	}
 
-	setPageButtons(sText) {
-		const linkDataPaths = utility.getDataPaths(sText)
-			.filter((each) => each[0] === "link")
-			.map((each) => each.slice(1));
+	// ===================================
+	// Page Buttons
+	// ===================================
+	renderLinkButtons(aasDataPaths) {
+		//
+		// @@|link|Google|https://google.com|orange
+		// [key|label|link|[color]]
+		//
 		const tempRiver = new F.River();
-		linkDataPaths.forEach((each, index) => {
+		aasDataPaths.forEach((each, index) => {
 			const id = "btn_" + index;
-			const label = each[0];
-			tempRiver[id].label(label).parentQuery_ = "#pageButtons";
+			const label = each[1];
+			tempRiver[id].label(label).parentQuery_ = "#linkButtons";
 		});
-		renderEngine.clear("#pageButtons");
+		renderEngine.clear("#linkButtons");
 		renderEngine.render(tempRiver);
-		linkDataPaths.forEach((each, index) => {
+		aasDataPaths.forEach((each, index) => {
 			const query = "#btn_" + index;
-			const link = each[1];
-			$(query).on("click",function(){
-				window.open(link,"_blank");
-			});
+			const link = each[2];
+			const color = each[3];
+			$(query).on("click", () => window.open(link, "_blank"));
+			if (color) {
+				$(query).css("backgroundColor", color);
+			}
 		});
 	}
 
+	renderBookmarkButtons(aasDataPaths) {
+		//
+		// @@|bookmark|red|References
+		// [key|[color]|[label]]
+		//
+		console.log(7777, aasDataPaths);
+		const tempRiver = new F.River();
+		aasDataPaths.forEach((each, index) => {
+			const id = "btn_" + index;
+			const key = each[0];
+			const lastColumn = key.split("/").slice(-1);
+			console.log(3333, "lastColumn", lastColumn);
+			const label = each[2] || lastColumn;
+			const buttonStream = tempRiver[id];
+			buttonStream.label(label);
+			buttonStream.parentQuery_ = "#bookmarkButtons";
+		});
+		renderEngine.clear("#bookmarkButtons");
+		renderEngine.render(tempRiver);
+		aasDataPaths.forEach((each, index) => {
+			const query = "#btn_" + index;
+			const key = each[0];
+			const color = each[1];
+			$(query).on("click", () => this.selectKey(key));
+			if (color) {
+				$(query).css("backgroundColor", color);
+			}
+		});
+	}
+
+	setLinkButtons(sText) {
+		const linkDataPaths = utility.getDataPaths(sText)
+			.filter((each) => each[0] === "link")
+			.map((each) => utility.prepended(each.slice(1), this.keyFromText(sText)));
+		this.river_.linkButtons.uPush(linkDataPaths);
+	}
+
+	setBookmarkButtons() {
+		const bookmarkDataPaths = [];
+		this.forEachKeyAndText((sKey, sText) => {
+			const pagePaths = utility.getDataPaths(sText)
+				.filter((each) => each[0] === "bookmark")
+				.map((each) => utility.prepended(each.slice(1), sKey));
+			console.log(6666, pagePaths);
+			bookmarkDataPaths.push(...pagePaths);
+		}).then(() => {
+			console.log(8888, bookmarkDataPaths);
+			this.river_.bookmarkButtons.uPush(bookmarkDataPaths);
+		});
+	}
+
+	// ===================================
+	// main
+	// ===================================
 	main() {
-		console.log("==== main() ====");
+		console.log("==== main() start ====");
 		renderEngine.render(this.river_);
-		this.updateKeys();
 		$("#btn_Save").addClass("getsDirty");
 		$("#btn_save").addClass("getsDirty");
-		this.read("Todo");
+		this.updateKeys();
+		this.selectKey("Todo");
+		this.setBookmarkButtons();
+		console.log("==== main() end ====");
 	}
 }
 

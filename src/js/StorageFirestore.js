@@ -74,6 +74,7 @@ class StorageFirestore {
 	// Storage API
 	// =========================
 	getItem(sKey, zResult, zError) {
+		// return promise f(sText)
 		return this.db.collection("Notes")
 			.doc(this.toDocId(sKey))
 			.get()
@@ -91,6 +92,7 @@ class StorageFirestore {
 	}
 
 	setItem(sKey, sText, zKeys, zError) {
+		// return promise f(asKeys)
 		return this.db.collection("Notes")
 			.doc(this.toDocId(sKey))
 			.set({text: sText})
@@ -101,6 +103,7 @@ class StorageFirestore {
 	}
 
 	removeItem(sKey, zKeys, zError) {
+		// return promise f(asKeys)
 		return this.db.collection("Notes")
 			.doc(this.toDocId(sKey))
 			.delete()
@@ -111,6 +114,7 @@ class StorageFirestore {
 	}
 
 	getKeys(zResult, zError) {
+		// return promise f(asKeys)
 		return this.db.collection("Notes").get()
 			.then((snapshotNotes) => {
 				const result = [];
@@ -124,6 +128,7 @@ class StorageFirestore {
 	}
 
 	getAllItems(zResult, zError) {
+		// return promise f(asTexts)
 		return this.db.collection("Notes").get()
 			.then((snapshotNotes) => {
 				const result = [];
