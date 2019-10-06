@@ -263,13 +263,11 @@ class App {
 		// @@|bookmark|red|References
 		// [key|[color]|[label]]
 		//
-		console.log(7777, aasDataPaths);
 		const tempRiver = new F.River();
 		aasDataPaths.forEach((each, index) => {
 			const id = "btn_" + index;
 			const key = each[0];
 			const lastColumn = key.split("/").slice(-1);
-			console.log(3333, "lastColumn", lastColumn);
 			const label = each[2] || lastColumn;
 			const buttonStream = tempRiver[id];
 			buttonStream.label(label);
@@ -301,10 +299,8 @@ class App {
 			const pagePaths = utility.getDataPaths(sText)
 				.filter((each) => each[0] === "bookmark")
 				.map((each) => utility.prepended(each.slice(1), sKey));
-			console.log(6666, pagePaths);
 			bookmarkDataPaths.push(...pagePaths);
 		}).then(() => {
-			console.log(8888, bookmarkDataPaths);
 			this.river_.bookmarkButtons.uPush(bookmarkDataPaths);
 		});
 	}
