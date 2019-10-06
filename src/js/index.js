@@ -12,13 +12,22 @@ console.log("start index.js");
 const renderEngine = new F.RenderEngine();
 const testRunner = new F.TestRunner();
 const utility = F.Utility;
-window.storage = new F.Storage("R10_");
-window.FF = F;
+const storage = new F.Storage("R10_");
 // ===============
 // app
 // ===============
 class App {
 	constructor() {
+		// ============================
+		// so can get access in console
+		// (e.g. app.utility_)
+		// ============================
+		this.renderEngine_ = renderEngine;
+		this.testRunner_ = testRunner;
+		this.utility_ = utility;
+		this.storage_ = storage;
+		this.factory_ = F;
+
 		this.initializeRiver();
 	}
 
