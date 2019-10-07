@@ -51,14 +51,6 @@ class StorageFirestore {
 		}
 	}
 
-	removeItem(sKey, zKeys) {
-		9999;
-		if (zKeys) {
-			zKeys.cuPush(this.getKeys());
-		}
-		return this;
-	}
-
 	// =========================
 	// Utility
 	// =========================

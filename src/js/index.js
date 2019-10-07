@@ -27,7 +27,6 @@ class App {
 		this.utility_ = utility;
 		this.storage_ = storage;
 		this.factory_ = F;
-
 		this.initializeRiver();
 	}
 
@@ -41,7 +40,8 @@ class App {
 		// Buttons
 		// ===================
 		this.river_.btn_save.onValue(() => this.save());
-		this.river_.btn_rename.label("Rename").onValue(() => console.log("Rename"));
+		this.river_.btn_rename.label("Rename").onValue(() => this.rename());
+		this.river_.btn_delete.onValue(() => this.remove());
 		this.river_.btn_todo.onValue(() => this.selectKey("Todo"));
 		this.river_.btn_backup.onValue(() => {
 			storage.getAllItems(null, this.river_.error).then((asTexts) => {
@@ -49,7 +49,6 @@ class App {
 			});
 		});
 		this.river_.btn_print.onValue(() => utility.print(this.river_.txt_text.value()));
-		this.river_.btn_delete.onValue(() => this.remove());
 		this.river_.btn_test1.label("TEST 1").onValue(() => this.test1());
 		// this.river_.btn_test2.label("TEST 2").onValue(() => this.test2());
 		// this.river_.btn_test3.label("TEST 3").onValue(() => this.test3());
@@ -130,13 +129,18 @@ class App {
 		// Note Stack
 		// ===================
 		this.river_.btn_today.parentQuery_ = "#note_buttons";
-		this.river_.btn_today.onValue(v => this.search(['@@|class|MemCard', new Date().toDateString()]));
+		this.river_.btn_today.onValue(v => this.search(["@@|class|MemCard", new Date().toDateString()]));
 		// ===================
 		// Link Buttons
 		// ===================
 		this.river_.linkButtons.onValue((v) => this.renderLinkButtons(v));
 		this.river_.bookmarkButtons.onValue((v) => this.renderBookmarkButtons(v));
 	}
+
+	log(s) {
+		this.river_.txt_log.appendString(s);
+	}
+
 
 	selectKey(sKey) {
 		return this.river_.selectedPath.uPush(sKey);
@@ -154,14 +158,23 @@ class App {
 		this.river_.selectedPath.uPush(key);
 	}
 
-	read(sKey) {
-		storage.getItem(sKey, this.river_.txt_text, this.river_.error);
-	}
-
 	remove() {
 		const text = this.river_.txt_text.value();
 		const key = this.keyFromText(text);
 		storage.removeItem(key, this.river_.paths, this.river_.error);
+	}
+
+	rename() {
+		// remove old item without updating paths
+		const oldKey = this.river_.selectedPath.value();
+		storage.removeItem(oldKey, null, this.river_.error)
+			.then(() => {
+				this.save();
+			});
+	}
+
+	read(sKey) {
+		storage.getItem(sKey, this.river_.txt_text, this.river_.error);
 	}
 
 	updateKeys() {
@@ -181,11 +194,9 @@ class App {
 	}
 
 	test1() {
-		this.forEachKeyAndText((sKey, sText) => {
-			console.log(5555, sKey, sText.slice(0, 20));
-		});
+		const result = moment(new Date()).format("YYYY/MM");
+		this.log(result);
 	}
-
 
 	search(asTerms) {
 		const result = [];
@@ -196,8 +207,6 @@ class App {
 		}).then(() => {
 			this.river_.paths.push(result);
 		});
-
-
 		// const terms = $("#form_search").val().toLowerCase().split(" ");
 		// const texts = storage.getAllItems();
 		// const keys = storage.getKeys();
@@ -305,14 +314,28 @@ class App {
 		});
 	}
 
+	today() {
+		const dayString = new Date().toLocaleDateString("en-US", {weekday: "long"});
+		this.goOrMake(Path.todayPath(), dayString);
+	}
+
+	goOrMake(sKey, sText = "") {
+		if (this.pathExists(sKey)) {
+			this.selectKey(sKey);
+		} else {
+			this.createPage(sKey, sText);
+		}
+	}
+
 	// ===================================
 	// main
 	// ===================================
 	main() {
 		console.log("==== main() start ====");
 		renderEngine.render(this.river_);
-		$("#btn_Save").addClass("getsDirty");
 		$("#btn_save").addClass("getsDirty");
+		$("#btn_rename").addClass("getsDirty");
+		$("#btn_delete").addClass("getsDirty");
 		this.updateKeys();
 		this.selectKey("Todo");
 		this.setBookmarkButtons();
