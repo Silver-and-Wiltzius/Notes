@@ -141,7 +141,6 @@ class App {
 		this.river_.txt_log.appendString(s);
 	}
 
-
 	selectKey(sKey) {
 		return this.river_.selectedPath.uPush(sKey);
 	}
@@ -332,21 +331,40 @@ class App {
 	// ===================================
 	main() {
 		console.log("==== main() start ====");
-		renderEngine.render(this.river_);
-		$("#btn_save").addClass("getsDirty");
-		$("#btn_rename").addClass("getsDirty");
-		$("#btn_delete").addClass("getsDirty");
-		this.updateKeys();
-		this.selectKey("Todo");
-		this.setBookmarkButtons();
-		console.log("==== main() end ====");
+		storage.login().then(() => {
+			console.log("==== logged in ====");
+			renderEngine.render(this.river_);
+			$("#btn_save").addClass("getsDirty");
+			$("#btn_rename").addClass("getsDirty");
+			$("#btn_delete").addClass("getsDirty");
+			this.updateKeys();
+			this.selectKey("Todo");
+			this.setBookmarkButtons();
+			console.log("==== main() end ====");
+		});
 	}
 }
 
 const app = new App();
 window.app = app;
+
+// "hidden" means tab is not selected in Chrome, NOT whether the page is visible
+
 $(document).ready(() => {
-	app.main();
+	if (document.hidden) {
+		console.log("==== document is hidden ====");
+		let f;
+		f = () =>  {
+			console.log("==== event visibilitychange (once) ====");
+			app.main();
+			document.removeEventListener("visibilitychange", f);
+		};
+		document.addEventListener("visibilitychange", f);
+	} else {
+		console.log("==== document is not hidden ====");
+		app.main();
+	}
 });
+
 console.log("end index.js");
 
