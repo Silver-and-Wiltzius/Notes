@@ -49,6 +49,7 @@ class App {
 			});
 		});
 		this.river_.btn_print.onValue(() => utility.print(this.river_.txt_text.value()));
+		this.river_.btn_today2.onValue(() => this.today());
 		this.river_.btn_test1.label("TEST 1").onValue(() => this.test1());
 		// this.river_.btn_test2.label("TEST 2").onValue(() => this.test2());
 		// this.river_.btn_test3.label("TEST 3").onValue(() => this.test3());
@@ -314,16 +315,31 @@ class App {
 	}
 
 	today() {
+		this.log(1111);
+		const path = moment(new Date()).format('YYYY/MM MMM/DD');
 		const dayString = new Date().toLocaleDateString("en-US", {weekday: "long"});
-		this.goOrMake(Path.todayPath(), dayString);
+		const text = path + "\n\n" + dayString;
+		this.log(2222);
+		this.goOrMake(path, text);
 	}
 
 	goOrMake(sKey, sText = "") {
 		if (this.pathExists(sKey)) {
+			this.log(3333);
 			this.selectKey(sKey);
 		} else {
+			this.log(4444);
 			this.createPage(sKey, sText);
 		}
+	}
+
+	pathExists(sPath) {
+		return this.river_.paths.value().includes(sPath);
+	}
+
+	createPage(sKey, sText) {
+		this.river_.txt_text.cuPush(sText);
+		this.save();
 	}
 
 	// ===================================
