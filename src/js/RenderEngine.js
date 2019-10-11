@@ -24,13 +24,14 @@ class RenderEngine {
 	render(river) {
 		const streamKeys = Object.keys(river.self_);
 		streamKeys.filter(each => each.startsWith("btn_")).forEach(each => {
-			this.renderButton(each, river);
+			//this.renderButton(each, river);
+			this.renderButton(river[each]);
 		});
-		streamKeys.filter(each => each.startsWith("btn2_")).forEach(each => {
-			this.renderButton2(river[each]);
-		});
+		// streamKeys.filter(each => each.startsWith("btn2_")).forEach(each => {
+		// 	this.renderButton2(river[each]);
+		// });
 		streamKeys.filter(each => each.startsWith("tbn_")).forEach(each => {
-			this.renderButton(each, river);
+			this.renderButton(river[each]);
 		});
 		streamKeys.filter(each => each.startsWith("form_")).forEach(each => {
 			const id = each;
@@ -54,10 +55,10 @@ class RenderEngine {
 			}, true);
 			river[`selection_${each}`].onValue(v => {
 				$(`#${id} li`).removeClass("selected");
-				$(`#${id} li`).filter(function() {
+				$(`#${id} li`).filter(function () {
 					return $(this).text() === v;
 				}).addClass("selected");
-			})
+			});
 		});
 		streamKeys.filter(each => each.startsWith("txt_")).forEach(each => {
 			const id = each;
@@ -85,34 +86,25 @@ class RenderEngine {
 		});
 	}
 
-	renderButton(each, river) {
+	renderButton(zButton) {
 		// btn_
-		const id = each;
-		const label = river[each].label() || this.labelFromIndex(each);
-		const parentQuery = river[each].parentQuery_ || "#buttons";
-		$(parentQuery).append(`<button id="${id}" class="Button">${label}</button>`);
-		$(`#${id}`).click(event => river[each].push(event));
-	}
-
-	renderButton2(zButton) {
-		// btn2_
+		// all buttons are toggle buttons, starting off false
 		const streamName = zButton.name_;
 		const parentQuery = zButton.parentQuery_ || "#buttons";
 		const label = zButton.label() || this.labelFromIndex(streamName);
 		$(parentQuery).append(`<button id="${streamName}" class="Button">${label}</button>`);
-		$(`#${streamName}`).click(event => zButton.push(event));
+		const $element = $(`#${streamName}`);
+		$element.click(() => {
+			if (zButton.value()) {
+				zButton.push(false);
+			} else {
+				zButton.push(true);
+			}
+		});
+		if (zButton.postRender_) {
+			zButton.postRender_($element);
+		}
 	}
-
-	// setLinks(sText) {
-	// 	const result = [];
-	// 	const callback = (o) => {
-	// 		result.push(<a className="KnowtLink KnowtWebLink" key={o.dataPath[1]} target="_blank"
-	// 		href={o.dataPath[2]}>{o.dataPath[1]}</a>);
-	// 	};
-	// 	//single knowt (text:)
-	// 	this.app.forEachDataPath({text: sText, name: "Link", f: callback});
-	// 	this.setState({knowtLinks: result});
-	// }
 
 	clear(sQuery) {
 		$(sQuery).empty();

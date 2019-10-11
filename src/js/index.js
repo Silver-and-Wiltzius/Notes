@@ -267,32 +267,46 @@ class App {
 		});
 	}
 
+	bookmarkLabel(asDataPath) {
+		const path = asDataPath[0];
+		const lastColumn = path.split("/").slice(-1)[0];
+		const label = asDataPath[2];
+		return label || lastColumn;
+	}
+
+	bookmarkSort(aasDataPaths) {
+		// destructive sort
+		aasDataPaths.sort((a, b) => this.bookmarkLabel(a).localeCompare(this.bookmarkLabel(b)));
+		return aasDataPaths;
+	}
+
 	renderBookmarkButtons(aasDataPaths) {
 		//
-		// @@|bookmark|red|References
-		// [key|[color]|[label]]
+		// @@|bookmark
+		// @@|bookmark|red
+		// @@|bookmark|red|All References
+		// [[path, [color], [label]], [path, [color], [label]]]
 		//
 		const tempRiver = new F.River();
-		aasDataPaths.forEach((each, index) => {
+		this.bookmarkSort(aasDataPaths).forEach((each, index) => {
 			const id = "btn_" + index;
-			const key = each[0];
-			const lastColumn = key.split("/").slice(-1);
+			const path = each[0];
+			const color = each[1];
+			const lastColumn = path.split("/").slice(-1);
 			const label = each[2] || lastColumn;
+			//
 			const buttonStream = tempRiver[id];
 			buttonStream.label(label);
 			buttonStream.parentQuery_ = "#bookmarkButtons";
+			buttonStream.postRender_ = ($element) => {
+				$element.on("click", () => this.selectKey(path));
+				if (color) {
+					$element.css("backgroundColor", color);
+				}
+			}
 		});
 		renderEngine.clear("#bookmarkButtons");
 		renderEngine.render(tempRiver);
-		aasDataPaths.forEach((each, index) => {
-			const query = "#btn_" + index;
-			const key = each[0];
-			const color = each[1];
-			$(query).on("click", () => this.selectKey(key));
-			if (color) {
-				$(query).css("backgroundColor", color);
-			}
-		});
 	}
 
 	setLinkButtons(sText) {
@@ -315,20 +329,16 @@ class App {
 	}
 
 	today() {
-		this.log(1111);
 		const path = moment(new Date()).format('YYYY/MM MMM/DD');
 		const dayString = new Date().toLocaleDateString("en-US", {weekday: "long"});
 		const text = path + "\n\n" + dayString;
-		this.log(2222);
 		this.goOrMake(path, text);
 	}
 
 	goOrMake(sKey, sText = "") {
 		if (this.pathExists(sKey)) {
-			this.log(3333);
 			this.selectKey(sKey);
 		} else {
-			this.log(4444);
 			this.createPage(sKey, sText);
 		}
 	}
