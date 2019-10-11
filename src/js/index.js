@@ -4,6 +4,7 @@ import moment from "moment";
 import {River} from "./River";
 import yaml from "js-yaml";
 
+
 console.log("start index.js");
 //
 // ===============
@@ -250,14 +251,14 @@ class App {
 		//
 		const tempRiver = new F.River();
 		aasDataPaths.forEach((each, index) => {
-			const id = "btn_" + index;
+			const id = "btn_link_" + index;
 			const label = each[1];
 			tempRiver[id].label(label).parentQuery_ = "#linkButtons";
 		});
 		renderEngine.clear("#linkButtons");
 		renderEngine.render(tempRiver);
 		aasDataPaths.forEach((each, index) => {
-			const query = "#btn_" + index;
+			const query = "btn_link_" + index;
 			const link = each[2];
 			const color = each[3];
 			$(query).on("click", () => window.open(link, "_blank"));
@@ -289,7 +290,7 @@ class App {
 		//
 		const tempRiver = new F.River();
 		this.bookmarkSort(aasDataPaths).forEach((each, index) => {
-			const id = "btn_" + index;
+			const id = "btn_bookmark_" + index;
 			const path = each[0];
 			const color = each[1];
 			const lastColumn = path.split("/").slice(-1);

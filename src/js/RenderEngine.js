@@ -1,4 +1,4 @@
-import TextPane from "./TextPane";
+import {TextPane, TextPane2} from "./TextPane";
 import {Finder} from "./Finder";
 import $ from "jquery";
 
@@ -60,7 +60,7 @@ class RenderEngine {
 				}).addClass("selected");
 			});
 		});
-		streamKeys.filter(each => each.startsWith("txt_")).forEach(each => {
+		streamKeys.filter(each => each.startsWith("txtOld_")).forEach(each => {
 			const id = each;
 			//create the textarea once
 			$("#panes").append(`<textarea id="${id}" class="TextPane"></textarea>`);
@@ -77,6 +77,11 @@ class RenderEngine {
 			river[each].onValue(v => {
 				$(`#${id}`).val(v);
 			}, true);
+		});
+		streamKeys.filter(each => each.startsWith("txt_")).forEach(each => {
+			const textStream = river[each];
+			const textPane = new TextPane2(textStream);
+			textPane.render();
 		});
 		streamKeys.filter(each => each.startsWith("fnd_")).forEach(each => {
 			const id = each;

@@ -2,7 +2,9 @@
 // ===============
 // text pane
 // ===============
-export default class TextPane {
+import $ from "jquery";
+
+class TextPane {
 	// ============================
 	// String
 	// ============================
@@ -113,7 +115,7 @@ export default class TextPane {
 
 	onSave(sText) {
 		// override this in the instance
-		console.log("onSave", sText.slice(0,100));
+		console.log("onSave", sText.slice(0, 100));
 	}
 
 	onKeyDown(event) {
@@ -143,3 +145,30 @@ export default class TextPane {
 		}
 	}
 }
+
+class TextPane2 extends TextPane {
+	constructor(zTextStream) {
+		super();
+		this.stream_ = zTextStream;
+	}
+
+	render() {
+		const id = this.stream_.name_;
+		//create the textarea once
+		$("#panes").append(`<textarea id="${id}" class="TextPane"></textarea>`);
+		const $element = $(`#${id}`);
+		// textarea key events
+		$element.on("keydown", this.onKeyDown.bind(this));
+		// textarea to stream
+		$element.on("change keyup paste", (event) => {
+			this.stream_.uPush($(event.target).val());
+		});
+		this.onSave = () => this.stream_.emit("eventSave");
+		// stream to text area
+		this.stream_.onValue(v => {
+			$element.val(v);
+		}, true);
+	}
+}
+
+export {TextPane, TextPane2};
