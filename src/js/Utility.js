@@ -179,8 +179,8 @@ asdf
 @@/44/55/66/77
 asdf
 asdf`;
-		const dataPaths = this.getDataPaths(text);
-		t.eq(dataPaths, 9999);
+		let result = this.getDataPaths(text);
+		t.eq(result, [["11", "22", "33"], ["44", "55", "66", "77"]]);
 	}
 }
 

@@ -4,7 +4,6 @@ import moment from "moment";
 import {River} from "./River";
 import yaml from "js-yaml";
 
-
 console.log("start index.js");
 //
 // ===============
@@ -179,7 +178,7 @@ class App {
 	}
 
 	updateKeys() {
-		storage.getKeys(this.river_.paths, this.river_.error);
+		return storage.getKeys(this.river_.paths, this.river_.error);
 	}
 
 	forEachKeyAndText(f) {
@@ -246,26 +245,29 @@ class App {
 	// ===================================
 	renderLinkButtons(aasDataPaths) {
 		//
+		// @@|link|Google|https://google.com
 		// @@|link|Google|https://google.com|orange
-		// [key|label|link|[color]]
+		// [label|link|[color]]
 		//
 		const tempRiver = new F.River();
 		aasDataPaths.forEach((each, index) => {
 			const id = "btn_link_" + index;
-			const label = each[1];
-			tempRiver[id].label(label).parentQuery_ = "#linkButtons";
+			const label = each[0];
+			const link = each[1];
+			const color = each[2];
+			//
+			const buttonStream = tempRiver[id];
+			buttonStream.label(label);
+			buttonStream.parentQuery_ = "#linkButtons";
+			buttonStream.postRender_ = ($element) => {
+				$element.on("click", () => window.open(link, "_blank"));
+				if (color) {
+					$element.css("backgroundColor", color);
+				}
+			};
 		});
 		renderEngine.clear("#linkButtons");
 		renderEngine.render(tempRiver);
-		aasDataPaths.forEach((each, index) => {
-			const query = "btn_link_" + index;
-			const link = each[2];
-			const color = each[3];
-			$(query).on("click", () => window.open(link, "_blank"));
-			if (color) {
-				$(query).css("backgroundColor", color);
-			}
-		});
 	}
 
 	bookmarkLabel(asDataPath) {
@@ -304,7 +306,7 @@ class App {
 				if (color) {
 					$element.css("backgroundColor", color);
 				}
-			}
+			};
 		});
 		renderEngine.clear("#bookmarkButtons");
 		renderEngine.render(tempRiver);
@@ -313,7 +315,7 @@ class App {
 	setLinkButtons(sText) {
 		const linkDataPaths = utility.getDataPaths(sText)
 			.filter((each) => each[0] === "link")
-			.map((each) => utility.prepended(each.slice(1), this.keyFromText(sText)));
+			.map((each) => each.slice(1));
 		this.river_.linkButtons.uPush(linkDataPaths);
 	}
 
@@ -330,7 +332,7 @@ class App {
 	}
 
 	today() {
-		const path = moment(new Date()).format('YYYY/MM MMM/DD');
+		const path = moment(new Date()).format("YYYY/MM MMM/DD");
 		const dayString = new Date().toLocaleDateString("en-US", {weekday: "long"});
 		const text = path + "\n\n" + dayString;
 		this.goOrMake(path, text);
@@ -364,8 +366,10 @@ class App {
 			$("#btn_save").addClass("getsDirty");
 			$("#btn_rename").addClass("getsDirty");
 			$("#btn_delete").addClass("getsDirty");
-			this.updateKeys();
-			this.selectKey("Todo");
+			this.updateKeys().then(() => {
+				//this.selectKey("Todo");
+				this.today();
+			});
 			this.setBookmarkButtons();
 			console.log("==== main() end ====");
 		});
@@ -374,14 +378,12 @@ class App {
 
 const app = new App();
 window.app = app;
-
 // "hidden" means tab is not selected in Chrome, NOT whether the page is visible
-
 $(document).ready(() => {
 	if (document.hidden) {
 		console.log("==== document is hidden ====");
 		let f;
-		f = () =>  {
+		f = () => {
 			console.log("==== event visibilitychange (once) ====");
 			app.main();
 			document.removeEventListener("visibilitychange", f);
@@ -392,6 +394,5 @@ $(document).ready(() => {
 		app.main();
 	}
 });
-
 console.log("end index.js");
 

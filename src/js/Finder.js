@@ -125,7 +125,7 @@ class Finder {
 		const firstKeys = paths.map(function (each) {
 			return each[0];
 		});
-		const uniqueFirstKeys = Array.from(new Set(firstKeys)).sort();
+		const uniqueFirstKeys = Array.from(new Set(firstKeys)).sort((a,b) => a.localeCompare(b));
 		let firstSelected;
 		if (asPath.length > 0 && uniqueFirstKeys.includes(asPath[0])) {
 			firstSelected = asPath[0];
@@ -161,8 +161,8 @@ class Finder {
 
 	static test_getColumns(t) {
 		const columns = Finder.getColumns([[1, 2, 3], [1, 2, 4], [1, 5, 6], [7, 8, 9]], [1]);
-		const resultJSON = JSON.stringify(columns, ["keys", "selected"]);
-		const desired = "[{\"keys\":[1,7],\"selected\":1},{\"keys\":[2,5],\"selected\":2},{\"keys\":[3,4],\"selected\":3}]";
+		const resultJSON = JSON.stringify(columns, ["keys_", "selectedKey_"]);
+		const desired = '[{"keys_":[1,7],"selectedKey_":1},{"keys_":[2,5],"selectedKey_":2},{"keys_":[3,4],"selectedKey_":3}]';
 		t.eq(resultJSON, desired);
 	}
 }

@@ -22,6 +22,7 @@ class TestParameter {
 			stringA = JSON.stringify(vA);
 			stringB = JSON.stringify(vB);
 		} catch (error) {
+			this.fail("ERROR: " + error.message, vA, vB);
 		}
 		if (_.isEqual(vA, vB)) {
 			this.succeed(vA, vB);
@@ -65,6 +66,11 @@ class TestParameter {
 
 	failBasic(sMessage, vA, vB) {
 		if (this.testEngine_.debugOnError_) {
+			debugger;
+		}
+		if (sMessage) {
+			console.log("test fail", sMessage, vA, vB);
+		} else {
 			console.log("test fail", vA, vB);
 		}
 		this.testEngine_.fail(this.selector_, this.category_, sMessage);
