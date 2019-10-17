@@ -122,8 +122,16 @@ class TextPane {
 		if (this.onTab(event)) {
 			// return if tab key was pressed
 			return this;
+		} else if (navigator.platform.match("Win") || navigator.platform.match("Linux")) {
+			if(event.keyCode == 83 && event.ctrlKey == true) {
+				const text = event.target.value;
+				this.eventStop(event);
+				this.onSave(text);
+				return this;
+			}
 		} else if ([17, 18, 91].includes(event.keyCode)) {
 			// return if modifier key is being pressed
+
 			return this;
 		} else if (event.metaKey) {
 			//command
