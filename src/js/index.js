@@ -190,13 +190,33 @@ class App {
 			});
 	}
 
+	forEachKeyAndTextAndData(f) {
+		// f(sKey, sText){}
+		return storage.getAllItems()
+			.then((asTexts) => {
+				asTexts.forEach((sText) => {
+					const key = this.keyFromText(sText);
+					const dataPaths = utility.getDataPaths(sText);
+					f(key, sText, dataPaths);
+				});
+				return asTexts;
+			});
+	}
+
+	dataToObject(aasData) {
+		const result = {};
+		aasData.forEach((each) => {
+			result[each[0]] = each.slice(1);
+		});
+		return result;
+	}
+
 	test1() {
 		const result = moment(new Date()).format("YYYY/MM");
 		this.log(result);
 	}
 
 	search(asTerms) {
-		console.log(asTerms)
 		const result = [];
 		this.forEachKeyAndText((sKey, sText) => {
 			if (asTerms.every((each) => sText.toLowerCase().includes(each.toLowerCase()))) {
