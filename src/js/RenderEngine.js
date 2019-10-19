@@ -24,12 +24,8 @@ class RenderEngine {
 	render(river) {
 		const streamKeys = Object.keys(river.self_);
 		streamKeys.filter(each => each.startsWith("btn_")).forEach(each => {
-			//this.renderButton(each, river);
 			this.renderButton(river[each]);
 		});
-		// streamKeys.filter(each => each.startsWith("btn2_")).forEach(each => {
-		// 	this.renderButton2(river[each]);
-		// });
 		streamKeys.filter(each => each.startsWith("tbn_")).forEach(each => {
 			this.renderButton(river[each]);
 		});
@@ -93,18 +89,21 @@ class RenderEngine {
 
 	renderButton(zButton) {
 		// btn_
-		// all buttons are toggle buttons, starting off false
+		// all buttons are toggle buttons, starting as false/off
 		const streamName = zButton.name_;
 		const parentQuery = zButton.parentQuery_ || "#buttons";
 		const label = zButton.label() || this.labelFromIndex(streamName);
 		$(parentQuery).append(`<button id="${streamName}" class="Button">${label}</button>`);
 		const $element = $(`#${streamName}`);
-		$element.click(() => {
-			if (zButton.value()) {
-				zButton.push(false);
+		zButton.onValue((v) => {
+			if (v) {
+				$element.addClass("on").removeClass("off");
 			} else {
-				zButton.push(true);
+				$element.addClass("off").removeClass("on");
 			}
+		}, true);
+		$element.click(() => {
+			zButton.push(!zButton.value());
 		});
 		if (zButton.postRender_) {
 			zButton.postRender_($element);

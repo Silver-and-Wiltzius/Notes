@@ -57,16 +57,11 @@ class App {
 		// ===================
 		// Toggle Buttons
 		// ===================
-		this.river_.tbn_setColor.parentQuery_ = "#t_buttons";
-		this.river_.tbn_setColor.toggled_ = false;
-		this.river_.tbn_setColor.onValue(v => {
-			const toggleState = this.river_.tbn_setColor.toggled_;
-			if (toggleState) {
-				$("#tbn_setColor").css("backgroundColor", "red");
-				this.river_.tbn_setColor.toggled_ = false;
+		this.river_.btn_setColor.onValue(v => {
+			if (v) {
+				$("#btn_setColor").css("backgroundColor", "red");
 			} else {
-				$("#tbn_setColor").css("backgroundColor", "green");
-				this.river_.tbn_setColor.toggled_ = true;
+				$("#btn_setColor").css("backgroundColor", "green");
 			}
 		});
 		// ===================
