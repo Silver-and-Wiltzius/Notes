@@ -126,6 +126,8 @@ class App {
 		// ===================
 		this.river_.btn_today.parentQuery_ = "#note_buttons";
 		this.river_.btn_today.onValue(v => this.search(["@@|class|MemCard", new Date().toDateString()]));
+		this.river_.btn_flip.parentQuery_ = "#note_buttons";
+		this.river_.btn_flip.onValue();
 		// ===================
 		// Link Buttons
 		// ===================
@@ -194,6 +196,7 @@ class App {
 	}
 
 	search(asTerms) {
+		console.log(asTerms)
 		const result = [];
 		this.forEachKeyAndText((sKey, sText) => {
 			if (asTerms.every((each) => sText.toLowerCase().includes(each.toLowerCase()))) {
